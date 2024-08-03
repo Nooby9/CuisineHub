@@ -2,28 +2,50 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PressableButton from './PressableButton';
+import { useNavigation } from '@react-navigation/native';
+import { colors,commonStyles } from '../style';
 
 const PostItem = ({ item }) => {
   const [likes, setLikes] = useState(item.likes);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const navigation = useNavigation();
 
   const handleLikePress = () => {
-    setLikes(likes + 1);
+    setIsFavorite(!isFavorite);
+    if(isFavorite){
+      setLikes(likes + 1);
+    }else{
+      setLikes(likes - 1);
+    }
+    
+  };
+
+  const handlePostPress = () => {
+    navigation.navigate('Post', { post: item });
   };
 
   return (
-    <Pressable style={styles.card} onPress={() => console.log('Item pressed', item.title)}>
+    <View style={styles.card}>
+    <Pressable   onPress={handlePostPress}>
       <Image source={{ uri: item.image }} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
+      </Pressable>
       <View style={styles.cardFooter}>
         <Text style={styles.cardAuthor}>{item.author}</Text>
-        <PressableButton onPress={handleLikePress}>
-          <View style={styles.likeSection}>
-          <Icon name="heart-outline" size={16} color="#aaa" />
-          <Text style={styles.cardLikes}>{likes}</Text>
-          </View>
-        </PressableButton>
+
+        <View style={commonStyles.likeSection}>
+          <PressableButton onPress={handleLikePress}>
+          <Icon
+          name={isFavorite ? 'heart' : 'heart-outline'} // Toggle between filled and outline
+          size={18}
+          color={isFavorite ? colors.favorite : colors.notFavorite} // Toggle color
+        />
+          </PressableButton>
+          <Text style={commonStyles.cardLikes}>{likes}</Text>
+        </View>
       </View>
-    </Pressable>
+    
+    </View>
   );
 };
 
@@ -36,6 +58,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#eee',
+    flexDirection: 'column', // Arrange children vertically
+    justifyContent: 'space-between', // Distribute space to move footer to bottom
   },
   cardImage: {
     width: '100%',
@@ -52,19 +76,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingBottom: 10,
+    marginTop: 'auto', // Pushes footer to the bottom
   },
   cardAuthor: {
     fontSize: 12,
     color: '#777',
-  },
-  likeSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardLikes: {
-    fontSize: 12,
-    color: '#777',
-    marginLeft: 5,
   },
 });
 
