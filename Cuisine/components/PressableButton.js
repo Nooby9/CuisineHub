@@ -26,7 +26,7 @@ const PressableButton = ({ children, onPress }) => {
 
 const styles = StyleSheet.create({
     button: {
-        marginRight: 15,
+        marginRight: 5,
     },
 });
 
