@@ -24,7 +24,7 @@ function Tabs() {
       },
     })}>
       <Tab.Screen
-        name="Home"
+        name="HomeScreen"
         component={HomeScreen}
         options={{ tabBarIcon:({ color, size }) => ( <AntDesign name="home" size={24} color="black" />) }}
       />
