@@ -29,6 +29,15 @@ const RestaurantScreen = () => {
             </View>
             <Text style={styles.restaurantType}>{restaurant.type}</Text>
         </View>
+        <View style={styles.locationSection}>
+            <View style={styles.locationLeft}>
+                <Text style={styles.locationTitle}>Location: </Text>
+                <Text style={styles.location}>1234 Street Name, City, State, 12345</Text>
+            </View>
+            <View style={styles.locationRight}>
+                <Text>{">"}</Text>
+            </View>
+        </View>
     </ScrollView>
 
   )
@@ -59,10 +68,10 @@ const styles = StyleSheet.create({
     },
     restaurantSection: {
         padding: 15,
-    borderColor: 'white',
-    borderWidth:8,
-    borderRadius: 15,
-    backgroundColor: 'lemonchiffon',
+        borderColor: 'white',
+        borderWidth:8,
+        borderRadius: 15,
+        backgroundColor: 'lemonchiffon',
     },
     restaurantInfo: {
         flexDirection: 'row',
@@ -137,4 +146,24 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(204, 204, 204, 0.3)',
         marginVertical: 5,
       },
+      locationSection: {
+        padding: 15,
+        borderColor: 'white',
+        borderWidth:8,
+        borderRadius: 15,
+        backgroundColor: 'lemonchiffon',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      locationTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+      },
+      location: {
+        fontSize: 14,
+        paddingTop: 5,
+      },
+
 });
