@@ -9,6 +9,8 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { screenOptions } from './style';
 import HomeScreen from './screens/HomeScreen';
 import PostScreen from './screens/PostScreen';
+import SearchScreen from './screens/SearchScreen';
+import RestaurantScreen from './screens/RestaurantScreen';
 
 // Create navigators
 const Stack = createNativeStackNavigator();
@@ -28,6 +30,11 @@ function Tabs() {
         component={HomeScreen}
         options={{ tabBarIcon:({ color, size }) => ( <AntDesign name="home" size={24} color="black" />) }}
       />
+      <Tab.Screen
+        name="SearchScreen"
+        component={SearchScreen}
+        options={{ tabBarIcon:({ color, size }) => ( <AntDesign name="search1" size={24} color="black" />) }}
+      />
 
     </Tab.Navigator>
   );
@@ -43,6 +50,7 @@ export default function App() {
       })}>
           <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
           <Stack.Screen name="Post" component={PostScreen} options={{ title: 'Post Details' }} />
+          <Stack.Screen name="Restaurant" component={RestaurantScreen} options={{ title: 'Restaurant Details' }} />
         </Stack.Navigator>
       </NavigationContainer>
   );
