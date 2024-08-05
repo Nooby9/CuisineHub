@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, FlatList } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { tripAdvisorApiKey } from '@env';
+import { googlePlacesApiKey } from '@env';
 
 const SearchScreen = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,19 +14,18 @@ const SearchScreen = ({navigation}) => {
     setLoading(true);
     const options = {
       method: 'GET',
-      url: 'https://api.content.tripadvisor.com/api/v1/location/search',
+      url: `https://maps.googleapis.com/maps/api/place/textsearch/json`,
       params: {
-        key: tripAdvisorApiKey,  
-        searchQuery: searchQuery,
-        category: 'restaurants',
+        query: searchQuery,
+        type: 'restaurant',
+        key: googlePlacesApiKey,
         language: 'en',
       },
-      headers: { accept: 'application/json' },
     };
 
     try {
       const response = await axios.request(options);
-      setRestaurants(response.data.data); 
+      setRestaurants(response.data.results);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
     } finally {
@@ -37,7 +36,7 @@ const SearchScreen = ({navigation}) => {
   const renderRestaurant = ({ item }) => (
     <View style={styles.restaurantContainer}>
       <Text style={styles.restaurantName}>{item.name}</Text>
-      <Text style={styles.restaurantAddress}>{item.address}</Text>
+      <Text style={styles.restaurantAddress}>{item.formatted_address}</Text>
     </View>
   );
 
@@ -64,7 +63,7 @@ const SearchScreen = ({navigation}) => {
       ) : (
         <FlatList
           data={restaurants}
-          keyExtractor={(item) => item.location_id.toString()}
+          keyExtractor={(item) => item.place_id.toString()}
           renderItem={renderRestaurant}
           ListEmptyComponent={<Text>No restaurants found</Text>}
         />
