@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, FlatList, Image } from 'react-native';
-import PressableButton from '../components/PressableButton';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, TextInput, View, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
+import PressableButton from '../components/PressableButton';
+import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 
-const SearchScreen = ({navigation}) => {
+const SearchScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [region, setRegion] = useState({
+    latitude: 37.4161493,
+    longitude: -122.0812166,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+
+  useEffect(() => {
+    (async () => {
+      // Request user location permission
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Location permission not granted');
+        return;
+      }
+
+      // Get current location
+      let location = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      });
+    })();
+  }, []);
 
   const handleSearchPress = async () => {
     setLoading(true);
@@ -27,6 +55,7 @@ const SearchScreen = ({navigation}) => {
       const response = await axios.request(options);
       console.log('Response:', response.data.results);
       setRestaurants(response.data.results);
+      updateMapRegion(response.data.results);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
     } finally {
@@ -34,12 +63,29 @@ const SearchScreen = ({navigation}) => {
     }
   };
 
+  const updateMapRegion = (places) => {
+    if (places.length === 0) return;
+
+    // Use the coordinates of the first restaurant
+    const firstPlace = places[0];
+    setRegion({
+      latitude: firstPlace.geometry.location.lat,
+      longitude: firstPlace.geometry.location.lng,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    });
+  };
+
   const getPhotoUrl = (photoReference) => {
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googlePlacesApiKey}`;
   };
 
+  const handleRestaurantPress = (restaurant) => {
+    navigation.navigate('Restaurant', { restaurant });
+  };
+
   const renderRestaurant = ({ item }) => (
-    <View style={styles.restaurantContainer}>
+    <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
       <Text style={styles.restaurantName}>{item.name}</Text>
       <Text style={styles.restaurantAddress}>{item.formatted_address}</Text>
       <Text>Rating: {item.rating} stars</Text>
@@ -50,7 +96,7 @@ const SearchScreen = ({navigation}) => {
           style={styles.restaurantPhoto}
         />
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -66,11 +112,22 @@ const SearchScreen = ({navigation}) => {
           <Ionicons name="search" size={24} color="black" />
         </PressableButton>
       </View>
-      {/* Temporary button to navigate to RestaurantScreen */}
-      <PressableButton onPress={() => navigation.navigate('Restaurant')}>
-        <Text>Go to Restaurant</Text>
-      </PressableButton>
-
+      <MapView
+        style={styles.map}
+        region={region}
+      >
+        {restaurants.map((restaurant) => (
+          <Marker
+            key={restaurant.place_id}
+            coordinate={{
+              latitude: restaurant.geometry.location.lat,
+              longitude: restaurant.geometry.location.lng,
+            }}
+            title={restaurant.name}
+            description={restaurant.formatted_address}
+          />
+        ))}
+      </MapView>
       {loading ? (
         <Text>Loading...</Text>
       ) : (
@@ -104,6 +161,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     marginRight: 10,
+  },
+  map: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.2,
   },
   restaurantContainer: {
     padding: 10,
