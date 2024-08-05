@@ -5,7 +5,8 @@ import { subscribeToCollection } from '../Firebase/firestoreHelper';
 import { collection, onSnapshot, query, where,doc, getDoc } from 'firebase/firestore';
 import { database } from '../Firebase/firebaseSetup';
 
-const COLLECTION_NAME = 'Post'; // Define your collection name
+ // Define collection name
+const COLLECTION_NAME = 'Post';
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
