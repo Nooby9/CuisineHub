@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, FlatList } from 'react-native';
+import { StyleSheet, Text, TextInput, View, FlatList, Image } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const SearchScreen = ({navigation}) => {
       url: `https://maps.googleapis.com/maps/api/place/textsearch/json`,
       params: {
         query: searchQuery,
-        type: 'restaurant',
+        includedType: 'restaurant',
         key: googlePlacesApiKey,
         language: 'en',
       },
@@ -25,6 +25,7 @@ const SearchScreen = ({navigation}) => {
 
     try {
       const response = await axios.request(options);
+      console.log('Response:', response.data.results);
       setRestaurants(response.data.results);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
@@ -33,10 +34,22 @@ const SearchScreen = ({navigation}) => {
     }
   };
 
+  const getPhotoUrl = (photoReference) => {
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googlePlacesApiKey}`;
+  };
+
   const renderRestaurant = ({ item }) => (
     <View style={styles.restaurantContainer}>
       <Text style={styles.restaurantName}>{item.name}</Text>
       <Text style={styles.restaurantAddress}>{item.formatted_address}</Text>
+      <Text>Rating: {item.rating} stars</Text>
+      <Text>Number of Ratings: {item.user_ratings_total}</Text>
+      {item.photos && item.photos.length > 0 && (
+        <Image
+          source={{ uri: getPhotoUrl(item.photos[0].photo_reference) }}
+          style={styles.restaurantPhoto}
+        />
+      )}
     </View>
   );
 
@@ -104,5 +117,11 @@ const styles = StyleSheet.create({
   restaurantAddress: {
     fontSize: 14,
     color: '#666',
+  },
+  restaurantPhoto: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+    borderRadius: 4,
   },
 });

@@ -1,0 +1,744 @@
+Response: [
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "5094 Kingsway, Burnaby, BC V5H 2E7, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJ1f9nhFp2hlQRzpgHzwrt7Gg",
+        "plus_code": {
+            "compound_code": "62G5+4P Burnaby, British Columbia",
+            "global_code": "84XV62G5+4P"
+        },
+        "price_level": 1,
+        "rating": 2.7,
+        "reference": "ChIJ1f9nhFp2hlQRzpgHzwrt7Gg",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 755
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "4820 Kingsway #331, Burnaby, BC V5H 4P1, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJYUEpBll2hlQRivuYh0u54Fw",
+        "plus_code": {
+            "compound_code": "62G3+56 Burnaby, British Columbia",
+            "global_code": "84XV62G3+56"
+        },
+        "price_level": 1,
+        "rating": 2.8,
+        "reference": "ChIJYUEpBll2hlQRivuYh0u54Fw",
+        "types": [
+            "meal_delivery",
+            "meal_takeaway",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 211
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "726 6th St, New Westminster, BC V3L 3C5, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJ0wGslt53hlQRGe_CBWztzd4",
+        "plus_code": {
+            "compound_code": "638G+2Q New Westminster, British Columbia",
+            "global_code": "84XV638G+2Q"
+        },
+        "price_level": 1,
+        "rating": 2.7,
+        "reference": "ChIJ0wGslt53hlQRGe_CBWztzd4",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 802
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "2190 Kingsway, Vancouver, BC V5N 2T5, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJjXOew6V2hlQRnBFp_sJgrv8",
+        "plus_code": {
+            "compound_code": "6WVQ+94 Vancouver, British Columbia",
+            "global_code": "84XR6WVQ+94"
+        },
+        "price_level": 1,
+        "rating": 3,
+        "reference": "ChIJjXOew6V2hlQRnBFp_sJgrv8",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 772
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "6487 Knight St, Vancouver, BC V5P 2V9, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJ-xPUSTx0hlQRQaLO2cAzJjM",
+        "plus_code": {
+            "compound_code": "6WGC+6V Vancouver, British Columbia",
+            "global_code": "84XR6WGC+6V"
+        },
+        "price_level": 1,
+        "rating": 3,
+        "reference": "ChIJ-xPUSTx0hlQRQaLO2cAzJjM",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 731
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "795 E Broadway, Vancouver, BC V5T 1X8, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJ6Qk_MlpxhlQRpammmuxWmZ0",
+        "plus_code": {
+            "compound_code": "7W77+32 Vancouver, British Columbia",
+            "global_code": "84XR7W77+32"
+        },
+        "price_level": 1,
+        "rating": 3.3,
+        "reference": "ChIJ6Qk_MlpxhlQRpammmuxWmZ0",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 716
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "602 Clarke Rd, Coquitlam, BC V3J 3X6, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJYwwSaUx4hlQR0Md1dan8-Ks",
+        "plus_code": {
+            "compound_code": "7477+C5 Coquitlam, British Columbia",
+            "global_code": "84XV7477+C5"
+        },
+        "price_level": 1,
+        "rating": 2.7,
+        "reference": "ChIJYwwSaUx4hlQR0Md1dan8-Ks",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 615
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "8555 Sea Island Wy #125, Richmond, BC V6X 3C7, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJY1jJ8QB1hlQRb3x0JE3ZzTk",
+        "plus_code": {
+            "compound_code": "5VRC+MF Richmond, British Columbia",
+            "global_code": "84XR5VRC+MF"
+        },
+        "price_level": 1,
+        "rating": 3,
+        "reference": "ChIJY1jJ8QB1hlQRb3x0JE3ZzTk",
+        "types": [
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 163
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "8737 120 St, Delta, BC V4C 6R5, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJLc3aUQjZhVQRLdPlIa4nBJU",
+        "plus_code": {
+            "compound_code": "5465+JM Delta, British Columbia",
+            "global_code": "84XV5465+JM"
+        },
+        "price_level": 1,
+        "rating": 2.5,
+        "reference": "ChIJLc3aUQjZhVQRLdPlIa4nBJU",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 592
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "12121 72 Ave, Surrey, BC V3W 2M1, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJv4_L9WDZhVQRXZ2Gic23Eqk",
+        "plus_code": {
+            "compound_code": "44M7+P4 Surrey, British Columbia",
+            "global_code": "84XV44M7+P4"
+        },
+        "price_level": 1,
+        "rating": 3,
+        "reference": "ChIJv4_L9WDZhVQRXZ2Gic23Eqk",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 800
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "2608 W Broadway, Vancouver, BC V6K 3T4, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJDTChYCFzhlQREeyzkIQOV-o",
+        "plus_code": {
+            "compound_code": "7R7P+G2 Vancouver, British Columbia",
+            "global_code": "84XR7R7P+G2"
+        },
+        "price_level": 1,
+        "rating": 3.2,
+        "reference": "ChIJDTChYCFzhlQREeyzkIQOV-o",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 213
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "1147 Davie St, Vancouver, BC V6E 1N2, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJFY9CZityhlQRROGvHMu9Iqs",
+        "plus_code": {
+            "compound_code": "7VJ9+G4 Vancouver, British Columbia",
+            "global_code": "84XR7VJ9+G4"
+        },
+        "price_level": 1,
+        "rating": 3.1,
+        "reference": "ChIJFY9CZityhlQRROGvHMu9Iqs",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 833
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "2255 Lonsdale Ave, North Vancouver, BC V7L 3E2, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJeZPcqj1whlQRpCbCS_-uGXM",
+        "plus_code": {
+            "compound_code": "8WJH+22 North Vancouver, British Columbia",
+            "global_code": "84XR8WJH+22"
+        },
+        "price_level": 1,
+        "rating": 3,
+        "reference": "ChIJeZPcqj1whlQRpCbCS_-uGXM",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 870
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "13577 73 Ave, Surrey, BC V3W 2R6, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJDTXxpC3ahVQRf9bruKvDpn4",
+        "plus_code": {
+            "compound_code": "45P3+4H Surrey, British Columbia",
+            "global_code": "84XV45P3+4H"
+        },
+        "price_level": 1,
+        "rating": 3.2,
+        "reference": "ChIJDTXxpC3ahVQRf9bruKvDpn4",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 898
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "10153 King George Blvd, Surrey, BC V3T 2W1, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJo6aWiNPZhVQR-1ovjjgGNbU",
+        "plus_code": {
+            "compound_code": "55P2+V3 Surrey, British Columbia",
+            "global_code": "84XV55P2+V3"
+        },
+        "price_level": 1,
+        "rating": 3.2,
+        "reference": "ChIJo6aWiNPZhVQR-1ovjjgGNbU",
+        "types": [
+            "meal_delivery",
+            "meal_takeaway",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 473
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "SC 1020 LANSDOWNE PARK, 5300 No. 3 Rd, Richmond, BC V6X 2X9, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJv9trlDF1hlQRkxFya7UU5eg",
+        "plus_code": {
+            "compound_code": "5VG9+83 Richmond, British Columbia",
+            "global_code": "84XR5VG9+83"
+        },
+        "price_level": 1,
+        "rating": 3.3,
+        "reference": "ChIJv9trlDF1hlQRkxFya7UU5eg",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 128
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "6551 No. 3 Rd, Richmond, BC V6Y 2B6, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJJa-roMsKhlQRnK0T3jYygSQ",
+        "plus_code": {
+            "compound_code": "5V86+GP Richmond, British Columbia",
+            "global_code": "84XR5V86+GP"
+        },
+        "price_level": 1,
+        "rating": 2.6,
+        "reference": "ChIJJa-roMsKhlQRnK0T3jYygSQ",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 137
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "2991 Lougheed Hwy., Coquitlam, BC V3B 6J6, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJuwbJIzV_hlQRsjEsnSlXP8Q",
+        "plus_code": {
+            "compound_code": "76H3+5W Coquitlam, British Columbia",
+            "global_code": "84XV76H3+5W"
+        },
+        "price_level": 1,
+        "rating": 2.5,
+        "reference": "ChIJuwbJIzV_hlQRsjEsnSlXP8Q",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 850
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "10355 152 St, Surrey, BC V3R 7B9, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJ6XRy32zXhVQRyS168mD05zw",
+        "plus_code": {
+            "compound_code": "55QX+Q3 Surrey, British Columbia",
+            "global_code": "84XV55QX+Q3"
+        },
+        "price_level": 1,
+        "rating": 2.8,
+        "reference": "ChIJ6XRy32zXhVQRyS168mD05zw",
+        "types": [
+            "meal_delivery",
+            "meal_takeaway",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 140
+    },
+    {
+        "business_status": "OPERATIONAL",
+        "formatted_address": "9056 152 St, Surrey, BC V3R 4E7, Canada",
+        "geometry": {
+            "location": [Object
+            ],
+            "viewport": [Object
+            ]
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
+        "icon_background_color": "#FF9E67",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+        "name": "KFC",
+        "opening_hours": {
+            "open_now": true
+        },
+        "photos": [
+            [Object
+            ]
+        ],
+        "place_id": "ChIJWcew4VDXhVQRXvVtHFP9jvo",
+        "plus_code": {
+            "compound_code": "558X+XM Surrey, British Columbia",
+            "global_code": "84XV558X+XM"
+        },
+        "price_level": 1,
+        "rating": 2.6,
+        "reference": "ChIJWcew4VDXhVQRXvVtHFP9jvo",
+        "types": [
+            "meal_delivery",
+            "restaurant",
+            "food",
+            "point_of_interest",
+            "establishment"
+        ],
+        "user_ratings_total": 917
+    }
+]
