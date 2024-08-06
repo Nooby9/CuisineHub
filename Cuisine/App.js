@@ -11,6 +11,9 @@ import HomeScreen from './screens/HomeScreen';
 import PostScreen from './screens/PostScreen';
 import SearchScreen from './screens/SearchScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 // Create navigators
 const Stack = createNativeStackNavigator();
@@ -34,6 +37,11 @@ function Tabs() {
         name="SearchScreen"
         component={SearchScreen}
         options={{ tabBarIcon:({ color, size }) => ( <AntDesign name="search1" size={24} color="black" />) }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarIcon: ({ color, size }) => (<Ionicons name="person-outline" size={24} color="black" />) }}
       />
 
     </Tab.Navigator>
