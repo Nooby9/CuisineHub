@@ -23,25 +23,10 @@ const HomeScreen = () => {
         if (!querySnapshot.empty) {
           const promises = querySnapshot.docs.map(async (doc) => {
             const postData = doc.data();
-            let restaurantData = null;
-
-            // Check if the restaurant reference exists and fetch the details
-            if (postData.restaurant && postData.restaurant.path) {
-              try {
-                const restaurantRef = postData.restaurant; // Assuming restaurant is a DocumentReference
-                const restaurantDoc = await getDoc(restaurantRef);
-                if (restaurantDoc.exists) {
-                  restaurantData = restaurantDoc.data();
-                }
-              } catch (error) {
-                console.error('Error fetching restaurant details:', error);
-              }
-            }
 
             return {
               id: doc.id,
-              ...postData,
-              restaurant: restaurantData,
+              ...postData
             };
           });
 
