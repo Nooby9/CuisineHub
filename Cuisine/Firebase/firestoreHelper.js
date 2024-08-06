@@ -1,4 +1,4 @@
-import { addDoc, deleteDoc, updateDoc, collection, getDocs, doc } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { database } from './firebaseSetup';
 
 
@@ -20,4 +20,18 @@ export async function updateDB(id, data, collectionName) {
         console.error("Update db: ", e);
     }
 }
+
+export async function getUserInfoDB(userId) {
+    try {
+      const userDoc = await getDoc(doc(database, 'User', userId));
+      if (userDoc.exists()) {
+        return userDoc.data();
+      } else {
+        console.log('No such document!');
+        return null;
+      }
+    } catch (e) {
+      console.error('Error getting document: ', e);
+    }
+  }
 
