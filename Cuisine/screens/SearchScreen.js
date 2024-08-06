@@ -81,7 +81,7 @@ const SearchScreen = ({ navigation }) => {
   };
 
   const handleRestaurantPress = (restaurant) => {
-    navigation.navigate('Restaurant', { restaurant });
+    navigation.navigate('Restaurant', { place_id:restaurant.place_id });
   };
 
   const renderRestaurant = ({ item }) => (

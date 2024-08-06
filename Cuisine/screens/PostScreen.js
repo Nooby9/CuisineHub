@@ -1,19 +1,45 @@
 // PostScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
+import axios from 'axios';
+import { googlePlacesApiKey } from '@env';
+
+// Function to fetch place details from Google Places API
+const fetchPlaceDetails = async (place_id) => {
+    try {
+        const response = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
+            params: {
+                place_id: place_id,
+                key: googlePlacesApiKey,
+                fields: 'name,rating,formatted_address,photos,types',
+            },
+        });
+        return response.data.result;
+    } catch (error) {
+        console.error('Error fetching place details:', error);
+        return null;
+    }
+};
 
 const PostScreen = ({ route }) => {
     const { post } = route.params;
     const [isFavorite, setIsFavorite] = useState(false);
-    const [bookmarked, setBookmarked] = useState(false);
+    const [restaurant, setRestaurant] = useState(null);
+    const navigation = useNavigation();
 
-    const toggleLike = () => {
-        setLiked(!liked);
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            if (post.place_id) {
+                const placeDetails = await fetchPlaceDetails(post.place_id);
+                setRestaurant(placeDetails);
+            }
+        };
+        fetchData();
+    }, [post.place_id]);
 
     const handlePress = () => {
         setIsFavorite(!isFavorite);
@@ -22,6 +48,16 @@ const PostScreen = ({ route }) => {
     const renderImage = ({ item }) => (
         <Image source={{ uri: item }} style={styles.postImage} />
     );
+
+    const navigateToRestaurant = (place_id) => {
+        if (place_id) {
+            navigation.navigate('Restaurant', { place_id });
+        }
+    };
+
+    if (!restaurant) {
+        return <Text>Loading restaurant information...</Text>;
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -35,27 +71,31 @@ const PostScreen = ({ route }) => {
             />
 
             <View style={styles.restaurantSection}>
-                {/* TODO */}
-                <Pressable style={styles.restaurantInfo} onPress={() => console.log('Navigate to restaurant')}>
+                <Pressable style={styles.restaurantInfo} onPress={() => navigateToRestaurant(post.place_id)}>
                     <View style={styles.restaurantDetail}>
-                    <Text style={styles.restaurantName}>{post.restaurant.name}</Text>
-                    <Text style={styles.restaurantRating}>· {post.restaurant.rating}</Text>
+                        <Text style={styles.restaurantName}>{restaurant.name}</Text>
+                        <MaterialIcons
+                            name="chevron-right" // Add an arrow to indicate navigation
+                            size={22}
+                            color="#777"
+                            style={styles.chevron}
+                        />
+
                     </View>
-                    
+
                     <View style={commonStyles.likeSection}>
                         <PressableButton onPress={handlePress} >
                             <MaterialIcons
-                                // Toggle between filled and outlined icon
                                 name={isFavorite ? 'favorite' : 'favorite-border'}
                                 size={22}
-                                // Change color based on state
                                 color={isFavorite ? colors.favorite : colors.notFavorite}
                             />
                         </PressableButton>
-                        <Text style={commonStyles.cardLikes}>{post.likes}</Text>
                     </View>
                 </Pressable>
-                <Text style={styles.restaurantType}>{post.restaurant.type}</Text>
+
+                <Text style={styles.restaurantRating}>{restaurant.rating} stars</Text>
+                <Text style={styles.restaurantAddress}>{restaurant.formatted_address}</Text>
             </View>
 
             <View style={styles.commentSection}>
@@ -65,7 +105,6 @@ const PostScreen = ({ route }) => {
             <View style={styles.dateLocationSection}>
                 <Text style={styles.date}>Posted on {post.date}</Text>
                 <Text style={styles.location}>{post.location}</Text>
-                
             </View>
             <View style={styles.divider} />
 
@@ -77,7 +116,6 @@ const PostScreen = ({ route }) => {
                             <Text style={styles.commentAuthor}>{comment.author}</Text>
                             <Text>{comment.text}</Text>
                         </View>
-                        {/* Add a divider line between comments, except after the last comment */}
                         {index < post.comments.length - 1 && (
                             <View style={styles.divider} />
                         )}
@@ -101,9 +139,6 @@ const styles = StyleSheet.create({
     },
     commentSection: {
         padding: 15,
-        // backgroundColor: '#f9f9f9',
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#eee',
     },
     comment: {
         fontSize: 14,
@@ -111,21 +146,21 @@ const styles = StyleSheet.create({
     },
     restaurantSection: {
         padding: 15,
-    borderColor: 'white',
-    borderWidth:8,
-    borderRadius: 15,
-    backgroundColor: 'lemonchiffon',
+        borderColor: 'white',
+        borderWidth: 8,
+        borderRadius: 15,
+        backgroundColor: 'lemonchiffon',
     },
     restaurantInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    restaurantDetail:{
+    restaurantDetail: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom:5
+        marginBottom: 5,
     },
     restaurantName: {
         fontSize: 16,
@@ -133,29 +168,22 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     restaurantRating: {
-        marginHorizontal:5,
-        fontSize: 16,
+        fontSize: 14,
         color: '#777',
     },
-    restaurantType:{
-        fontSize: 15,
-        color: '#777',
-    },
-    restaurantReviews: {
-        fontSize: 12,
+    restaurantAddress: {
+        fontSize: 14,
         color: '#777',
     },
     dateLocationSection: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 15,
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#eee',
     },
     date: {
         fontSize: 14,
         color: '#777',
-        marginRight: 10
+        marginRight: 10,
     },
     location: {
         fontSize: 14,
@@ -168,27 +196,23 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
-      },
-    //   commentContainer: {
-    //     marginBottom: 15,
-    //   },
-      commentItem: {
+    },
+    commentContainer: {
+        marginBottom: 15,
+    },
+    commentItem: {
         padding: 10,
-        // borderColor: '#eee',
-        // borderWidth: 1,
-        // borderRadius: 8,
-        // backgroundColor: '#f9f9f9',
-      },
-      commentAuthor: {
+    },
+    commentAuthor: {
         fontSize: 14,
         fontWeight: 'bold',
         marginBottom: 5,
-      },
-      divider: {
+    },
+    divider: {
         height: 1,
         backgroundColor: 'rgba(204, 204, 204, 0.3)',
         marginVertical: 5,
-      },
+    },
 });
 
 export default PostScreen;

@@ -24,9 +24,9 @@ const getPhotoUrl = (photoReference, maxWidth = 400) => {
 };
 
 const RestaurantScreen = ({ route }) => {
-  const { place_id } = route.params.restaurant;
-  console.log(route.params);
-  console.log(place_id);
+  const place_id = route.params.place_id;
+  console.log("params: ",route.params);
+  console.log("place_id: ",place_id);
   const [restaurant, setRestaurant] = useState(null);
   const [photos, setPhotos] = useState([]);
 
