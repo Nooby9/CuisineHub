@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import PostItem from '../components/PostItem'; // Ensure correct import path
 import { subscribeToCollection } from '../Firebase/firestoreHelper';
-import { collection, onSnapshot, query, where,doc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
 import { database } from '../Firebase/firebaseSetup';
+import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 
- // Define collection name
-const COLLECTION_NAME = 'Post';
+
+// Define collection name
+const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -22,14 +24,14 @@ const HomeScreen = () => {
           const promises = querySnapshot.docs.map(async (doc) => {
             const postData = doc.data();
             let restaurantData = null;
-            
+
             // Check if the restaurant reference exists and fetch the details
             if (postData.restaurant && postData.restaurant.path) {
               try {
                 const restaurantRef = postData.restaurant; // Assuming restaurant is a DocumentReference
-                const restaurantDoc = await getDoc(restaurantRef); 
+                const restaurantDoc = await getDoc(restaurantRef);
                 if (restaurantDoc.exists) {
-                  restaurantData = restaurantDoc.data();  
+                  restaurantData = restaurantDoc.data();
                 }
               } catch (error) {
                 console.error('Error fetching restaurant details:', error);
@@ -55,8 +57,7 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <FlatList
-          data={posts}
-        // data={sampleData}
+        data={posts}
         renderItem={({ item }) => <PostItem item={item} />}
         keyExtractor={(item) => item.id}
         numColumns={2}
