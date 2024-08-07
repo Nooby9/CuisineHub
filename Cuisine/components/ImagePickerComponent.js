@@ -103,6 +103,7 @@ const ImagePickerComponent = ({ onImageSelect }) => {
 
   return (
     <View style={styles.container}>
+
       {/* Image Gallery */}
       <FlatList
         data={selectedImages}
@@ -115,7 +116,6 @@ const ImagePickerComponent = ({ onImageSelect }) => {
           </View>
         }
       />
-
       {/* Button Container */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={pickImages}>
@@ -127,6 +127,8 @@ const ImagePickerComponent = ({ onImageSelect }) => {
           <Text>Take Photo</Text>
         </TouchableOpacity>
       </View>
+
+      
     </View>
   );
 };
@@ -139,11 +141,11 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
-    margin: 5,
+    marginBottom:5
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 85,
+    height: 85,
     borderRadius: 10,
   },
   deleteButton: {
@@ -158,8 +160,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   placeholder: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderWidth: 1,
     borderColor: '#ccc',
     justifyContent: 'center',
@@ -170,12 +172,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '80%',
     marginTop: 10,
   },
   button: {
     alignItems: 'center',
-    padding: 10,
+    padding: 6,
   },
 });
 

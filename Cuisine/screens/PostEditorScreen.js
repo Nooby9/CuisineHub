@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'; // Import Google Places Autocomplete component
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the ImagePickerComponent
 import { googlePlacesApiKey } from '@env';
@@ -20,7 +20,7 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState(''); // State to store search query
     const [restaurants, setRestaurants] = useState([]); // State to store search results
     const [showDropdown, setShowDropdown] = useState(false);
-    const[author, setAuthor] = useState('');
+    const [author, setAuthor] = useState('');
 
     // Callback function to handle image selection
     const handleImageSelect = (uris) => {
@@ -61,17 +61,17 @@ const PostEditorScreen = ({ navigation, route }) => {
     // Function to handle post submission
     const handleSubmit = async () => {
         // Check if the title is empty
-    if (!title.trim()) {
-        Alert.alert('Title Required', 'Please enter a title for your post.');
-        return;
-      }
-  
-      // Check if the content is empty
-      if (!content.trim()) {
-        Alert.alert('Content Required', 'Please enter content for your post.');
-        return;
-      }
-        
+        if (!title.trim()) {
+            Alert.alert('Title Required', 'Please enter a title for your post.');
+            return;
+        }
+
+        // Check if the content is empty
+        if (!content.trim()) {
+            Alert.alert('Content Required', 'Please enter content for your post.');
+            return;
+        }
+
         // Check if at least one image is selected
         if (images.length === 0) {
             Alert.alert('No Image Selected', 'Please select at least one image before submitting.');
@@ -85,7 +85,7 @@ const PostEditorScreen = ({ navigation, route }) => {
         }
 
         // Use "Anonymous" if author is empty
-    const authorName = author || 'Anonymous';
+        const authorName = author || 'Anonymous';
 
         // Prepare the post data
         const postData = {
@@ -114,26 +114,6 @@ const PostEditorScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.container}>
-            {/* Image Picker */}
-            <ImagePickerComponent onImageSelect={handleImageSelect} />
-
-            {/* Title Input */}
-            <TextInput
-                style={styles.input}
-                placeholder="Title"
-                value={title}
-                onChangeText={setTitle}
-            />
-
-            {/* Content Input */}
-            <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Content"
-                value={content}
-                onChangeText={setContent}
-                multiline
-                numberOfLines={4}
-            />
 
             {/* Search for Restaurants */}
             <View style={styles.searchContainer}>
@@ -165,6 +145,26 @@ const PostEditorScreen = ({ navigation, route }) => {
                 />
             )}
 
+            {/* Title Input */}
+            <TextInput
+                style={styles.input}
+                placeholder="Title"
+                value={title}
+                onChangeText={setTitle}
+            />
+
+            {/* Content Input */}
+            <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Content"
+                value={content}
+                onChangeText={setContent}
+                multiline
+                numberOfLines={4}
+            />
+            {/* Image Picker */}
+            <ImagePickerComponent onImageSelect={handleImageSelect} />
+
             {/* Post Button */}
             <View style={styles.buttonContainer}>
                 <Pressable
@@ -179,6 +179,7 @@ const PostEditorScreen = ({ navigation, route }) => {
                     </Text>
                 </Pressable>
             </View>
+
         </View>
     );
 };
@@ -213,10 +214,11 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         padding: 10,
-        marginRight:5
+        marginRight: 5
     },
     dropdown: {
         maxHeight: 200,
+        minHeight: 200,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
@@ -237,8 +239,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         paddingHorizontal: 40, // Add padding on both sides
-      },
-      postButton: {
+    },
+    postButton: {
         height: 40,
         backgroundColor: '#ff3b30',
         borderRadius: 25,
@@ -249,15 +251,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 3,
         elevation: 5,
-      },
-      pressedStyle: {
+    },
+    pressedStyle: {
         opacity: 0.8,
-      },
-      postButtonText: {
+    },
+    postButtonText: {
         color: '#ffffff',
         fontSize: 18,
         fontWeight: 'bold',
-      },
+    },
 });
 
 export default PostEditorScreen;
