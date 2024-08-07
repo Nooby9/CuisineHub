@@ -133,7 +133,7 @@ Huijia Wang<br />Shurui Xu
 - Read profile information from database
 - Created saved posts/favorite screen
 - Use PostItem in saved posts screen to display all the posts that a user has saved
-- ![Search Restaurant](Screenshots/search_restaurant.png)
-- ![Restaurant Pin](Screenshots/restaurant_pin.png)
-- ![Profile Page](Screenshots/profile_page.png)
-- ![Saved Posts](Screenshots/save_post.png)
+- ![Search Restaurant](image/README/search_restaurant.png)
+- ![Restaurant Pin](image/README/restaurant_pin.png)
+- ![Profile Page](image/README/profile_page.png)
+- ![Saved Posts](image/README/save_post.png)
