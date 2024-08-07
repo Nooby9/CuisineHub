@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -13,6 +13,7 @@ import { fetchPlaceDetails } from '../utils/CommonMethod';
 
 const FoodJournalScreen = ({ navigation }) => {
     const [posts, setPosts] = useState([]); // State to store user's posts
+    const [loading, setLoading] = useState(true);
     const [region, setRegion] = useState({
         // Initial region setup for the map
         latitude: 37.4161493,
@@ -26,52 +27,33 @@ const FoodJournalScreen = ({ navigation }) => {
     // Fetch user's posts and get user location on component mount
     useEffect(() => {
         (async () => {
-          // Request user location permission
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-            console.error('Location permission not granted');
-            return;
-          }
-    
-          // Get current location
-          let location = await Location.getCurrentPositionAsync({});
-          setRegion({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.35,
-            longitudeDelta: 0.35,
-          });
+            try {
+                // Request user location permission
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    console.error('Location permission not granted');
+                    setLoading(false); // Stop loading if permission is denied
+                    return;
+                }
+
+                // Get current location
+                let location = await Location.getCurrentPositionAsync({});
+                setRegion({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.35,
+                    longitudeDelta: 0.35,
+                });
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            } finally {
+                setLoading(false); // Stop loading once location is set
+            }
         })();
-      }, []);;
+    }, []);
+
     // Fetch user's posts and get user location on component mount
     useEffect(() => {
-        // const setupLocationAndListener = async () => {
-        //     try {
-        //         // Request user location permission
-        //         let { status } = await Location.requestForegroundPermissionsAsync();
-        //         if (status !== 'granted') {
-        //             console.error('Location permission not granted');
-        //             return;
-        //         }
-
-        //         // Get current location
-        //         let location = await Location.getCurrentPositionAsync({});
-        //         setRegion({
-        //             latitude: location.coords.latitude,
-        //             longitude: location.coords.longitude,
-        //             latitudeDelta: 0.50,
-        //             longitudeDelta: 0.50,
-        //         });
-        //     } catch (error) {
-        //         console.error('Error fetching location:', error);
-        //     }
-        // };
-
-
-
-        // setupLocationAndListener();
-
-        // Set up Firestore onSnapshot listener
         const unsubscribe = onSnapshot(
             collection(database, COLLECTION_NAME),
             async (querySnapshot) => {
@@ -85,7 +67,6 @@ const FoodJournalScreen = ({ navigation }) => {
                         let placeDetails = {};
                         if (postData.place_id) {
                             placeDetails = await fetchPlaceDetails(postData.place_id);
-                            console.log("placeDetails",placeDetails)
                         }
 
                         return {
@@ -146,21 +127,35 @@ const FoodJournalScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             {/* Map View */}
-            <MapView style={styles.map} region={region}>
-                {posts.map((post) => (
-                    <Marker
-                        key={post.place_id}
-                        coordinate={{
-                            latitude: post.placeDetails.geometry.location.lat,
-                            longitude: post.placeDetails.geometry.location.lng,
-                        }}
-                        title={post.placeDetails.name}
-                        description={
-                            post.placeDetails ? post.placeDetails.formatted_address : post.comment
-                        }
-                    />
-                ))}
-            </MapView>
+            <View style={styles.mapContainer}>
+                <MapView
+                    style={styles.map}
+                    region={region}
+                >
+                    {posts.map((post) => (
+                        <Marker
+                            key={post.place_id}
+                            coordinate={{
+                                latitude: post.placeDetails.geometry.location.lat,
+                                longitude: post.placeDetails.geometry.location.lng,
+                            }}
+                            title={post.placeDetails.name}
+                            description={
+                                post.placeDetails ? post.placeDetails.formatted_address : post.comment
+                            }
+                        />
+                    ))}
+                </MapView>
+
+                {/* Loading Indicator */}
+                {loading && (
+                    <View style={styles.loadingOverlay}>
+                        <ActivityIndicator size="large" color="#ff3b30" />
+                        <Text style={styles.loadingText}>Loading map...</Text>
+                    </View>
+                )}
+
+            </View>
 
             {/* Post List */}
             <FlatList
@@ -181,9 +176,29 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    map: {
+    mapContainer: {
+        position: 'relative', // Allows the loading overlay to be positioned absolutely within the map container
         width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height / 3.5, // Half screen height
+        height: Dimensions.get('window').height / 3.5, // Adjusted for a smaller map height
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject, // Makes the map fill the entire container
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 18,
+        color: '#333', // Dark text color for visibility
+        fontWeight: 'bold',
     },
     postList: {
         padding: 10,
