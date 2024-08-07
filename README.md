@@ -82,12 +82,26 @@ npx expo start --tunnel
   - **Delete:** Posts can be deleted directly from the user's journal.
     <a name="Hj0Y9"></a>
 
-### 2. User TODO
+### 2. User
+- **Description:** Stores all users with details about their profile information.
+- **CRUD Operations:**
+  - **Create:** This should get the auth.id from the authenticaiton step when a user first registers from the platform. (Not implemented)
+  - **Read:** 
+    - **User Profile:** User can see their personal profile information with their image. 
+  - **Update:** Users can update their profile from the profile page. (To be implemented, a function for updating the database is in place.)
+  - **Delete:** We have to decide whether a user can delete their profile/account. (To-do)
+    <a name="Hj0Y9"></a>
 
 <a name="HvvcR"></a>
 
-### 3. Favourites TODO
-
+### 3. Saved Posts/Favorites
+- **Description:** Stores ids of all favorited posts a user has liked. 
+- **CRUD Operations:**
+  - **Create:** Adds the id of a post to the SavedPosts subcollection in User.
+  - **Read:** 
+    - **Saved Posts Screen:** Reads the id from SavedPosts and gets the post detail from the post collection. 
+  - **Delete:** Remove the saved post id from the subcollection. 
+    <a name="Hj0Y9"></a>
 <a name="Pf563"></a>
 
 ## 5. Team Members
@@ -107,5 +121,14 @@ Huijia Wang<br />Shurui Xu
 
 <a name="YcsAz"></a>
 
-#### Shurui Xu TODO
+#### Shurui Xu
+- Set-up the initial expo app and firebase connection
+- Set-up Google places API key from Google Cloud
+- Created search and restaurant screen
+- Displays restaurant details (name, ratings, photos, location, opening hour) from Google places details API in restaurant screen
+- Used Google places search API to search restaurants nearby
+- Created profile screen
+- Read profile information from database
+- Created saved posts/favorite screen
+- Use PostItem in saved posts screen to display all the posts that a user has saved
 
