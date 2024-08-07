@@ -35,3 +35,16 @@ export async function getUserInfoDB(userId) {
     }
   }
 
+  export async function getSavedPosts(userId) {
+    try {
+        const savedPostsCollection = collection(database, `User/${userId}/SavedPosts`);
+        const savedPostsSnapshot = await getDocs(savedPostsCollection);
+        const savedPostIds = savedPostsSnapshot.docs.map(doc => doc.data().PostID);
+        return savedPostIds;
+    } catch (e) {
+        console.error('Error getting saved posts: ', e);
+    }
+}
+
+
+
