@@ -7,23 +7,7 @@ import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
-
-// Function to fetch place details from Google Places API
-const fetchPlaceDetails = async (place_id) => {
-    try {
-        const response = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
-            params: {
-                place_id: place_id,
-                key: googlePlacesApiKey,
-                fields: 'name,rating,formatted_address,photos,types',
-            },
-        });
-        return response.data.result;
-    } catch (error) {
-        console.error('Error fetching place details:', error);
-        return null;
-    }
-};
+import { fetchPlaceDetails } from '../utils/CommonMethod';
 
 const PostScreen = ({ route }) => {
     const { post } = route.params;
@@ -102,10 +86,7 @@ const PostScreen = ({ route }) => {
                 <Text style={styles.comment}>{post.comment}</Text>
             </View>
 
-            <View style={styles.dateLocationSection}>
-                <Text style={styles.date}>Posted on {post.date}</Text>
-                <Text style={styles.location}>{post.location}</Text>
-            </View>
+            <Text style={styles.date}>Posted on {post.date}</Text>
             <View style={styles.divider} />
 
             <View style={styles.commentsSection}>
@@ -175,15 +156,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#777',
     },
-    dateLocationSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 15,
-    },
     date: {
         fontSize: 14,
         color: '#777',
-        marginRight: 10,
+        alignItems: 'center',
+        marginHorizontal:15
     },
     location: {
         fontSize: 14,
