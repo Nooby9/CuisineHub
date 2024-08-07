@@ -14,6 +14,7 @@ import RestaurantScreen from './screens/RestaurantScreen';
 import PostEditorScreen from './screens/PostEditorScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import FoodJournalScreen from './screens/FoodJournalScreen';
+import SavedPostsScreen from './screens/SavedPostsScreen';
 
 // Create navigators
 const Stack = createNativeStackNavigator();
@@ -61,6 +62,7 @@ export default function App() {
         <Stack.Screen name="New Post" component={PostEditorScreen} />
         <Stack.Screen name="Edit Post" component={PostEditorScreen} />
         <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
+        <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
