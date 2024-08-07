@@ -57,13 +57,14 @@ npx expo start --tunnel
   
   
 
-### 2. User TODO
+### 2. User
 
-<a name="czjPm"></a>
+- **email (String):** The email of the user.
+- **name (String):** The name of the user.
+- **photoUrl (String):** The profile photo of the user.
 
-### 3. Favourite TODO
-
-<a name="PgjcU"></a>
+### 3. SavedPosts (A User Subcollection)
+- **PostID (String):** The post id for the user's favorite/saved post.
 
 ## 4. Collections and  CRUD Operations  
 
