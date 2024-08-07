@@ -7,7 +7,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { screenOptions } from './style';
-import HomeScreen from './screens/HomeScreen';
+import DiscoverScreen from './screens/DiscoverScreen';
 import PostScreen from './screens/PostScreen';
 import SearchScreen from './screens/SearchScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
@@ -30,7 +30,7 @@ function Tabs() {
     })}>
       <Tab.Screen
         name="Discover"
-        component={HomeScreen}
+        component={DiscoverScreen}
         options={{ tabBarIcon: ({ color, size }) => (<AntDesign name="home" size={24} color="black" />) }}
       />
       <Tab.Screen

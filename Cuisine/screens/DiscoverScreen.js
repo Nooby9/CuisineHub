@@ -10,7 +10,7 @@ import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 // Define collection name
 const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
-const HomeScreen = () => {
+const DiscoverScreen = () => {
   const [posts, setPosts] = useState([]);
 
 
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default DiscoverScreen;
