@@ -54,8 +54,6 @@ npx expo start --tunnel
 - **likes (Number):** Number of likes on the post.
 - **date (String):** The date the post was created in YYYY-MM-DD format.
 - **comments (Array):** List of other uers' comments on the post.
-  
-  
 
 ### 2. User
 
@@ -64,9 +62,10 @@ npx expo start --tunnel
 - **photoUrl (String):** The profile photo of the user.
 
 ### 3. SavedPosts (A User Subcollection)
+
 - **PostID (String):** The post id for the user's favorite/saved post.
 
-## 4. Collections and  CRUD Operations  
+## 4. Collections and  CRUD Operations
 
 <a name="Fmiz4"></a>
 
@@ -75,7 +74,7 @@ npx expo start --tunnel
 - **Description:** Stores all user posts with details about their dining experiences.  Each post includes:  title, comment, images, other users' comments,  etc.
 - **CRUD Operations:**
   - **Create:** Implemented in the `PostEditorScreen` where users can create a new post.
-  - **Read:** 
+  - **Read:**
     - **User Profile:** Users can view and manage their own posts, displaying all their dining experiences in the format of map and list.
     - **DiscoverScreen:** Fetches popular and recent posts shared by other users, helping users discover new and trending dining spots. Posts are sorted based on metrics like the number of likes to highlight popular experiences.
   - **Update:** Users can update posts from their journal.
@@ -83,11 +82,12 @@ npx expo start --tunnel
     <a name="Hj0Y9"></a>
 
 ### 2. User
+
 - **Description:** Stores all users with details about their profile information.
 - **CRUD Operations:**
   - **Create:** This should get the auth.id from the authenticaiton step when a user first registers from the platform. (Not implemented)
-  - **Read:** 
-    - **User Profile:** User can see their personal profile information with their image. 
+  - **Read:**
+    - **User Profile:** User can see their personal profile information with their image.
   - **Update:** Users can update their profile from the profile page. (To be implemented, a function for updating the database is in place.)
   - **Delete:** We have to decide whether a user can delete their profile/account. (To-do)
     <a name="Hj0Y9"></a>
@@ -95,14 +95,15 @@ npx expo start --tunnel
 <a name="HvvcR"></a>
 
 ### 3. Saved Posts/Favorites
-- **Description:** Stores ids of all favorited posts a user has liked. 
+
+- **Description:** Stores ids of all favorited posts a user has liked.
 - **CRUD Operations:**
   - **Create:** Adds the id of a post to the SavedPosts subcollection in User.
-  - **Read:** 
-    - **Saved Posts Screen:** Reads the id from SavedPosts and gets the post detail from the post collection. 
-  - **Delete:** Remove the saved post id from the subcollection. 
+  - **Read:**
+    - **Saved Posts Screen:** Reads the id from SavedPosts and gets the post detail from the post collection.
+  - **Delete:** Remove the saved post id from the subcollection.
     <a name="Hj0Y9"></a>
-<a name="Pf563"></a>
+    <a name="Pf563"></a>
 
 ## 5. Team Members
 
@@ -122,6 +123,7 @@ Huijia Wang<br />Shurui Xu
 <a name="YcsAz"></a>
 
 #### Shurui Xu
+
 - Set-up the initial expo app and firebase connection
 - Set-up Google places API key from Google Cloud
 - Created search and restaurant screen
@@ -131,4 +133,7 @@ Huijia Wang<br />Shurui Xu
 - Read profile information from database
 - Created saved posts/favorite screen
 - Use PostItem in saved posts screen to display all the posts that a user has saved
-
+- ![Search Restaurant](Screenshots/search_restaurant.png)
+- ![Restaurant Pin](Screenshots/restaurant_pin.png)
+- ![Profile Page](Screenshots/profile_page.png)
+- ![Saved Posts](Screenshots/save_post.png)
