@@ -110,7 +110,7 @@ npx expo start --tunnel
   * **Real-Time Updates** : Utilizes Firestore's onSnapshot for real-time updates to the posts.
   * **Navigation** : Users can click on a post to navigate to its detailed view.
 
-<img src="image/README/1723060285128.png" alt="Sample Image" width="300" height="580">
+<img src="image/README/1723060285128.png" alt="Sample Image" width="300" height="680">
 
 
 2. **PostScreen**
@@ -123,7 +123,7 @@ npx expo start --tunnel
   * **Comments Section** : Shows comments left by other users on the post.
   * **Restaurant Navigation** : Users can navigate to a detailed restaurant screen by clicking the restaurant name.
 
-<img src="image/README/1723060907751.png" alt="Sample Image" width="300" height="580">
+<img src="image/README/1723060907751.png" alt="Sample Image" width="300" height="680">
 
 3. **PostEditorScreen**
 
@@ -139,7 +139,7 @@ npx expo start --tunnel
   * **Form Validation** : Ensures all required fields (title, content, images, place_id) are filled before submission.
   * **Firestore Integration** : Submits the post data to Firestore with fields like title, images, place_id, comment, likes, date, and author (defaults to "Anonymous" if not specified).
 
-<img src="image/README/1723061319660.png" alt="Sample Image" width="300" height="580">
+<img src="image/README/1723061319660.png" alt="Sample Image" width="300" height="680">
 
 4. **FoodJournalScreen**
 
@@ -153,7 +153,7 @@ npx expo start --tunnel
   * **Markers** : Adds markers for each post, indicating the location of the restaurants in the map associated with posts.
   * **Post List** : Shows a list of user's posts below the map using a FlatList component.
 
-<img src="image/README/1723061795477.png" alt="Sample Image" width="300" height="580">
+<img src="image/README/1723061795477.png" alt="Sample Image" width="300" height="680">
 
 5. **ImagePickerComponent**
 
