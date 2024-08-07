@@ -1,16 +1,6 @@
 <a name="GE4oU"></a>
 
 # CuisineHub
-<<<<<<< HEAD
-Find posts and comments about restaurants!
-
-## Iteration 1
-### Shurui Xu
-
-
-
-### Huijia Wang
-=======
 
 <a name="XNEEc"></a>
 
@@ -118,4 +108,3 @@ Huijia Wang<br />Shurui Xu
 
 #### Shurui Xu TODO
 
->>>>>>> 250d7ff5b29b579f319c94e47ae68ef2fca22d88
