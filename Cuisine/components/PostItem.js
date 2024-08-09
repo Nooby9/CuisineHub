@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PressableButton from './PressableButton';
 import { useNavigation } from '@react-navigation/native';
+import { ref, getDownloadURL } from 'firebase/storage';
+import { storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { colors,commonStyles } from '../style';
 
 const PostItem = ({ item }) => {
   const [likes, setLikes] = useState(item.likes);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    async function fetchImageUrl() {
+      try {
+        const imageRef = ref(storage, item.imageUrls[0]);
+        const url = await getDownloadURL(imageRef);
+        setImageUrl(url);
+      } catch (error) {
+        console.error('Error fetching image URL:', error);
+        // Optionally set a fallback image or handle error
+      }
+    }
+
+    if (item.imageUrls && item.imageUrls[0]) {
+      fetchImageUrl();
+    }
+  }, [item.imageUrls]);
 
   const handleLikePress = () => {
     setIsFavorite(!isFavorite);
@@ -27,7 +47,7 @@ const PostItem = ({ item }) => {
   return (
     <View style={styles.card}>
     <Pressable   onPress={handlePostPress}>
-      <Image source={{ uri: item.images[0] }} style={styles.cardImage} />
+      <Image source={{ uri: imageUrl || 'fallback_image_url' }} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
       </Pressable>
       <View style={styles.cardFooter}>

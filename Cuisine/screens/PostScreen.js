@@ -7,12 +7,15 @@ import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
+import { ref, getDownloadURL } from 'firebase/storage';
+import { storage } from '../Firebase/firebaseSetup';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
 
 const PostScreen = ({ route }) => {
     const { post } = route.params;
     const [isFavorite, setIsFavorite] = useState(false);
     const [restaurant, setRestaurant] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -24,6 +27,24 @@ const PostScreen = ({ route }) => {
         };
         fetchData();
     }, [post.place_id]);
+
+    useEffect(() => {
+        async function fetchImageUrls() {
+            try {
+                const urls = await Promise.all(
+                    post.imageUrls.map(async (imageUri) => {
+                        const imageRef = ref(storage, imageUri);
+                        const url = await getDownloadURL(imageRef);
+                        return url;
+                    })
+                );
+                setImageUrls(urls);
+            } catch (error) {
+                console.error('Error fetching image URLs: ', error);
+            }
+        }
+        fetchImageUrls();
+    }, [post.imageUrls]);
 
     const handlePress = () => {
         setIsFavorite(!isFavorite);
@@ -46,7 +67,7 @@ const PostScreen = ({ route }) => {
     return (
         <ScrollView style={styles.container}>
             <FlatList
-                data={post.images}
+                data={imageUrls}
                 renderItem={renderImage}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
