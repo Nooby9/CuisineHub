@@ -1,13 +1,22 @@
-`<a name="GE4oU"></a>`
-
 # CuisineHub
-
-`<a name="XNEEc"></a>`
 
 ## 1. Overview
 
-**Cuisine Hub** is your ultimate guide to discovering and reviewing the best restaurants around you! Whether you're a casual diner or a gourmet enthusiast, Cuisine Hub makes it easy to find new dining spots, share your experiences, and read honest reviews from fellow food lovers. Turn every meal into an adventure with Cuisine Hub.`<br />`**Key Features**:`<br />`● **Explore Nearby**: Discover the best restaurants around you with our expertly curated recommendations, complete with user reviews and ratings to guide your next meal.`<br />`● **Search for Cuisine**: Easily search for specific types of cuisine, dishes, or restaurants to satisfy your cravings.  `<br />`● **Capture and Share**: Snap and upload stunning photos of your meals, tag the restaurant, and write detailed reviews to share your dining experiences.`<br />`● **Personal Food Journal**: Keep a beautifully organized log of all your restaurant visits and reviews, creating a personalized food diary.`<br />`● **Local Notifications**: Set reminders for upcoming restaurant visits to ensure you never miss out on the best culinary experiences.`<br />`Cuisine Hub transforms dining into a memorable experience. Join us to savor, share, and connect with a world of culinary delights. Make every meal count and start your delicious journey today!**
-**`<a name="AlcyB"></a>`
+**Cuisine Hub** is your ultimate guide to discovering and reviewing the best restaurants around you! Whether you're a casual diner or a gourmet enthusiast, Cuisine Hub makes it easy to find new dining spots, share your experiences, and read honest reviews from fellow food lovers. Turn every meal into an adventure with Cuisine Hub.
+
+**Key Features**:
+
+● **Explore Nearby**: Discover the best restaurants around you with our expertly curated recommendations, complete with user reviews and ratings to guide your next meal.
+
+● **Search for Cuisine**: Easily search for specific types of cuisine, dishes, or restaurants to satisfy your cravings. 
+
+● **Capture and Share**: Snap and upload stunning photos of your meals, tag the restaurant, and write detailed reviews to share your dining experiences.
+
+● **Personal Food Journal**: Keep a beautifully organized log of all your restaurant visits and reviews, creating a personalized food diary.
+
+● **Local Notifications**: Set reminders for upcoming restaurant visits to ensure you never miss out on the best culinary experiences.
+
+Cuisine Hub transforms dining into a memorable experience. Join us to savor, share, and connect with a world of culinary delights. Make every meal count and start your delicious journey today!**
 
 ## 2. Installation
 
@@ -20,7 +29,7 @@ npm install
 
 2. **Set up environment variables:**
 
-**Create a **`.env` file in the root directory and add your Google Places API Key and Firebase configuration:
+Create a `.env` file in the root directory and add your Google Places API Key and Firebase configuration:
 
 ```
 googlePlacesApiKey=YOUR_GOOGLE_PLACES_API_KEY
@@ -38,16 +47,12 @@ appId=your-firebase-app-id
 npx expo start --tunnel
 ```
 
-`<a name="SzqPI"></a>`
-
 ## 3. Data Model
-
-`<a name="MzNW4"></a>`
 
 ### 1. Post
 
 * **title (String):** The title of the post.
-* **images (Array):** URLs of uploaded images.
+* **imageUrls (Array):** URLs of images on Storage.
 * **place_id (String):** The Google Place ID of the restaurant.
 * **author (String):** The author of the post (defaults to "Anonymous" if not provided).
 * **comment (String):** The author's content of the post.
@@ -60,14 +65,11 @@ npx expo start --tunnel
 - **email (String):** The email of the user.
 - **name (String):** The name of the user.
 
-
 ### 3. SavedPosts (A User Subcollection)
+
 - **PostID (String):** The post id for the user's favorite/saved post.
 
-
 ## 4. Collections and  CRUD Operations
-
-`<a name="Fmiz4"></a>`
 
 ### 1. Post
 
@@ -78,9 +80,7 @@ npx expo start --tunnel
     * **User Profile:** Users can view and manage their own posts, displaying all their dining experiences in the format of map and list.
     * **DiscoverScreen:** Fetches popular and recent posts shared by other users, helping users discover new and trending dining spots. Posts are sorted based on metrics like the number of likes to highlight popular experiences.
   * **Update:** Users can update posts from their journal.
-  * **Delete:** Posts can be deleted directly from the user's journal.**
-    **`<a name="Hj0Y9"></a>`
-
+  * **Delete:** Posts can be deleted directly from the user's journal.
 
 ### 2. User
 
@@ -91,36 +91,30 @@ npx expo start --tunnel
     - **User Profile:** User can see their personal profile information with their image.
   - **Update:** Users can update their profile from the profile page. (To be implemented, a function for updating the database is in place.)
   - **Delete:** We have to decide whether a user can delete their profile/account. (To-do)
-    <a name="Hj0Y9"></a>
-
-`<a name="HvvcR"></a>`
 
 ### 3. Saved Posts/Favorites
+
 - **Description:** Stores ids of all favorited posts a user has liked.
 - **CRUD Operations:**
   - **Create:** Adds the id of a post to the SavedPosts subcollection in User.
   - **Read:**
     - **Saved Posts Screen:** Reads the id from SavedPosts and gets the post detail from the post collection.
   - **Delete:** Remove the saved post id from the subcollection.
-    <a name="Hj0Y9"></a>
-    <a name="Pf563"></a>
 
 ## 5. Team Members
 
-**Huijia Wang** `<br />`Shurui Xu**
-**`<a name="FUFaj"></a>`
+**Huijia Wang**
+
+**Shurui Xu**
 
 ## 6. Iteration Record
 
-`<a name="Se3Yo"></a>`
-
 ### 6.1 Iteration 1
-
-`<a name="oCBbn"></a>`
 
 #### Huijia Wang
 
 1. **DiscoverScreen**
+
 * **Functionality** : Enables users to discover and view posts shared by other users.
 * **Features** :
   * **Post List** : Displays a grid view of posts using a FlatList component.
@@ -128,7 +122,6 @@ npx expo start --tunnel
   * **Navigation** : Users can click on a post to navigate to its detailed view.
 
 <img src="image/README/1723060285128.png" alt="Sample Image" width="300" height="680">
-
 
 2. **PostScreen**
 
@@ -205,4 +198,3 @@ npx expo start --tunnel
 - ![Restaurant Pin](image/README/restaurant_pin.png)
 - ![Profile Page](image/README/profile_page.png)
 - ![Saved Posts](image/README/save_post.png)
-
