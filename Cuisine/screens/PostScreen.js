@@ -18,6 +18,7 @@ const PostScreen = ({ route }) => {
     const [imageUrls, setImageUrls] = useState([]);
     const navigation = useNavigation();
 
+    // useEffect to fetch restaurant details based on place_id from the post data
     useEffect(() => {
         const fetchData = async () => {
             if (post.place_id) {
@@ -28,6 +29,7 @@ const PostScreen = ({ route }) => {
         fetchData();
     }, [post.place_id]);
 
+    // useEffect to fetch image URLs from Firebase Storage
     useEffect(() => {
         async function fetchImageUrls() {
             try {
@@ -50,6 +52,7 @@ const PostScreen = ({ route }) => {
         setIsFavorite(!isFavorite);
     };
 
+    // Function to render each image in the FlatList
     const renderImage = ({ item }) => (
         <Image source={{ uri: item }} style={styles.postImage} />
     );

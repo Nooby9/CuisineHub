@@ -13,6 +13,7 @@ const PostItem = ({ item }) => {
   const [imageUrl, setImageUrl] = useState(null);
   const navigation = useNavigation();
 
+  // useEffect to fetch the image URL from Firebase Storage
   useEffect(() => {
     async function fetchImageUrl() {
       try {
@@ -25,6 +26,7 @@ const PostItem = ({ item }) => {
       }
     }
 
+    // Check if there is an image URL to fetch
     if (item.imageUrls && item.imageUrls[0]) {
       fetchImageUrl();
     }
