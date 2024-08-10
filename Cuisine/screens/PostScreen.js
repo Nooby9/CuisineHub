@@ -1,5 +1,5 @@
 // PostScreen.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -10,13 +10,83 @@ import { googlePlacesApiKey } from '@env';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../Firebase/firebaseSetup';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
+import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
+
+
+// Define collection name
+const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
 const PostScreen = ({ route }) => {
     const { post } = route.params;
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isRestaurantFavorite, setIsRestaurantFavorite] = useState(false);
     const [restaurant, setRestaurant] = useState(null);
     const [imageUrls, setImageUrls] = useState([]);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [likesCount, setLikesCount] = useState(0);
     const navigation = useNavigation();
+    //TODO: use this after supporting authentication
+  // const currentUserId = auth.currentUser.uid; 
+  const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
+
+   // useEffect to check if the user has already liked the post
+  useEffect(() => {
+    async function fetchLikeData() {
+        try {
+          const likedBy = await fetchArrayDataByField(COLLECTION_NAME, post.id, 'likedBy');
+  
+          setIsFavorite(likedBy.includes(currentUserId));
+          console.log(likedBy.length)
+          setLikesCount(likedBy.length);
+        } catch (error) {
+          console.error('Error checking if post is liked:', error);
+        }
+      }
+  
+      fetchLikeData();
+    }, []);
+  
+//     useFocusEffect(
+//       React.useCallback(() => {
+//           fetchLikeData();
+//       }, [item.id])
+//   );
+  
+    // Function to handle the like button press
+    const handleLikePress = async () => {
+      const newFavoriteState = !isFavorite; // Toggle the favorite state
+  
+      setIsFavorite(newFavoriteState); // Update the local favorite state
+  
+      try {
+        await updateLikeStatus(COLLECTION_NAME, post.id, 'likedBy', currentUserId, newFavoriteState);
+        setLikesCount(newFavoriteState ? likesCount + 1 : likesCount - 1); // Update the local likes count
+      } catch (error) {
+        console.error('Error updating likes in Firestore:', error);
+        // Optionally handle error, e.g., rollback the like count in UI
+      }
+    };
+    // Set up the header right button
+    // useEffect(() => {
+    //     navigation.setOptions({
+    //         headerRight: () => (
+    //             <View style={commonStyles.likeSection}>
+    //       <PressableButton onPress={handleLikePress}>
+    //       <Icon
+    //       name={isFavorite ? 'heart' : 'heart-outline'} // Toggle between filled and outline
+    //       size={18}
+    //       color={isFavorite ? colors.favorite : colors.notFavorite} // Toggle color
+    //     />
+    //       </PressableButton>
+    //       <Text style={commonStyles.cardLikes}>{likesCount}</Text>
+    //     </View>
+    //         ),
+    //     });
+    // }, [navigation, isFavorite]);
+
+    // useEffect to check if the user has already liked the post
+  
 
     // useEffect to fetch restaurant details based on place_id from the post data
     useEffect(() => {
@@ -49,7 +119,7 @@ const PostScreen = ({ route }) => {
     }, [post.imageUrls]);
 
     const handlePress = () => {
-        setIsFavorite(!isFavorite);
+        setIsRestaurantFavorite(!isRestaurantFavorite);
     };
 
     // Function to render each image in the FlatList
@@ -68,6 +138,7 @@ const PostScreen = ({ route }) => {
     }
 
     return (
+        <View style={styles.container}>
         <ScrollView style={styles.container}>
             <FlatList
                 data={imageUrls}
@@ -94,9 +165,9 @@ const PostScreen = ({ route }) => {
                     <View style={commonStyles.likeSection}>
                         <PressableButton onPress={handlePress} >
                             <MaterialIcons
-                                name={isFavorite ? 'favorite' : 'favorite-border'}
+                                name={isRestaurantFavorite ? 'favorite' : 'favorite-border'}
                                 size={22}
-                                color={isFavorite ? colors.favorite : colors.notFavorite}
+                                color={isRestaurantFavorite ? colors.favorite : colors.notFavorite}
                             />
                         </PressableButton>
                     </View>
@@ -107,6 +178,7 @@ const PostScreen = ({ route }) => {
             </View>
 
             <View style={styles.commentSection}>
+            
                 <Text style={styles.comment}>{post.comment}</Text>
             </View>
 
@@ -128,6 +200,14 @@ const PostScreen = ({ route }) => {
                 ))}
             </View>
         </ScrollView>
+        <Pressable style={styles.fab} onPress={handleLikePress}>
+        <Icon
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={28}
+            color={isFavorite ? colors.favorite : colors.notFavorite}
+        />
+    </Pressable>
+</View>
     );
 };
 
@@ -213,6 +293,15 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: 'rgba(204, 204, 204, 0.3)',
         marginVertical: 5,
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: 'paleturquoise',
+        borderRadius: 50,
+        padding: 15,
+        elevation: 5,
     },
 });
 
