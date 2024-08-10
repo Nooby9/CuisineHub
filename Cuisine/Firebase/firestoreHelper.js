@@ -1,6 +1,49 @@
-import { addDoc, deleteDoc, updateDoc, collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { addDoc, deleteDoc, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { database } from './firebaseSetup';
 
+// Function to fetch array data (e.g., likedBy) from a specific document
+export const fetchArrayDataByField = async (collectionName, docId, field) => {
+  try {
+    // Create a reference to the specific document in the specified collection
+    const documentRef = doc(database, collectionName, docId);
+    const document = await getDoc(documentRef);
+
+    if (!document.exists()) {
+      console.error('Document does not exist:', docId);
+      return [];
+    }
+
+    // Get the array from the specified field or default to an empty array
+    const fieldDataArray = document.data()[field] || [];
+    return fieldDataArray;
+  } catch (error) {
+    console.error('Error fetching data from Firestore:', error);
+    throw error;
+  }
+};
+
+// Function to update the array field (e.g., likedBy) in a specific document
+export const updateLikeStatus = async (collectionName, docId, likedByField, userId, isLiking) => {
+  try {
+    // Create a reference to the specific document in the specified collection
+    const documentRef = doc(database, collectionName, docId);
+
+    if (isLiking) {
+      // If the user is liking the document, add their ID to the array
+      await updateDoc(documentRef, {
+        [likedByField]: arrayUnion(userId),
+      });
+    } else {
+      // If the user is unliking the document, remove their ID from the array
+      await updateDoc(documentRef, {
+        [likedByField]: arrayRemove(userId),
+      });
+    }
+  } catch (error) {
+    console.error('Error updating array field in Firestore:', error);
+    throw error;
+  }
+};
 
 export async function writeToDB(data, collectionName) {
     try {
@@ -44,6 +87,29 @@ export async function getUserInfoDB(userId) {
     } catch (e) {
         console.error('Error getting saved posts: ', e);
     }
+}
+
+export async function getUserName(userId) {
+  try {
+      // Get the document reference for the user's data
+      const userDoc = await getDoc(doc(database, 'User', userId));
+
+      if (userDoc.exists()) {
+          // Extract user data from the document
+          const userData = userDoc.data();  // Ensure userData is defined here
+
+          // Return the user's name if it exists
+          if (userData.name) {
+              return userData.name;
+          } 
+      } else {
+          console.error('No such user!');
+          return null;
+      }
+  } catch (e) {
+      console.error('Error getting user name: ', e);
+      return null;
+  }
 }
 
 

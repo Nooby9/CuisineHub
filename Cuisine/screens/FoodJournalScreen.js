@@ -109,21 +109,6 @@ const FoodJournalScreen = ({ navigation }) => {
         }
     };
 
-    // Render a single post item
-    const renderPostItem = ({ item }) => (
-        <View style={styles.postCard}>
-            <Text style={styles.postTitle}>{item.title}</Text>
-            <View style={styles.postActions}>
-                <Pressable onPress={() => navigation.navigate('EditPost', { postId: item.id })}>
-                    <Text style={styles.editButton}>Edit</Text>
-                </Pressable>
-                <Pressable onPress={() => handleDelete(item.id)}>
-                    <Ionicons name="trash" size={24} color="red" />
-                </Pressable>
-            </View>
-        </View>
-    );
-
     return (
         <View style={styles.container}>
             {/* Map View */}
@@ -203,30 +188,27 @@ const styles = StyleSheet.create({
     postList: {
         padding: 10,
     },
-    postCard: {
-        backgroundColor: '#f8f8f8',
-        borderRadius: 10,
-        padding: 10,
+    postCardContainer: {
+        width: '48%',
         marginBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        position: 'relative', // Ensure the edit/delete buttons are positioned correctly
     },
-    postTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    postActions: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+    actionButton: {
+        position: 'absolute',
+        zIndex: 1, // Ensure it is on top of the PostItem component
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Background to make it visible
+        padding: 5, // Optional: Adjust padding
+        borderRadius: 50, // Circular background for better visibility
     },
     editButton: {
-        color: '#007BFF',
+        top: 5, // Aligns the edit button to the top of the post
+        right: 5, // Aligns the edit button to the right of the post
     },
+    deleteButton: {
+        bottom: 5, // Aligns the delete button to the bottom of the post
+        right: 5, // Aligns the delete button to the right of the post
+    },
+    
 });
 
 export default FoodJournalScreen;
