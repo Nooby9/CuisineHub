@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
 import { getUserInfoDB } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -86,7 +86,7 @@ const ProfileScreen = () => {
         source={{ uri: userInfo?.photoUrl || 'https://via.placeholder.com/150' }}
         style={styles.profilePicture}
       />
-      <Text style={styles.profileName}>{userInfo?.name || 'User Name'}</Text>
+      <Text style={styles.profileName}>{userInfo?.username || 'User Name'}</Text>
       <Text style={styles.profileName}>{auth.currentUser.email || 'User Email'}</Text>
       <View style={styles.editButtonContainer}>
         <PressableButton onPress={handleEditProfile}>
@@ -108,6 +108,16 @@ const ProfileScreen = () => {
 
       <TouchableOpacity style={styles.actionButton} onPress={handleNotifications}>
         <Text style={styles.actionText}>Notifications</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.signoutButton} onPress={()=>{
+          try{
+            signOut(auth)
+          } catch (error) {
+            console.log("Error signing out: ", error);
+          }
+        }}>
+        <Text style={styles.signoutText}>Sign Out</Text>
       </TouchableOpacity>
     </View>
   );
@@ -152,6 +162,18 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 16,
     color: '#333',
+  },
+  signoutButton: {
+    backgroundColor: 'red',
+    padding: 15,
+    marginTop: 10,
+    width: '90%',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  signoutText: {
+    fontSize: 16,
+    color: 'white',
   },
 });
 

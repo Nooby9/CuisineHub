@@ -2,16 +2,33 @@ import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native'
 import React from 'react'
 import { auth } from '../Firebase/firebaseSetup'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { database } from '../Firebase/firebaseSetup' 
+import { doc, setDoc } from 'firebase/firestore'
+
+export async function writeWithIdToDB(data, collectionName, id){
+  try{
+      await setDoc(doc(database, collectionName, id), data, {merge: true});
+  }
+  catch(e) {
+      console.error("Writing to database with id error: ", e);
+  }
+}
 
 const SignupScreen = ({navigation}) => {
+    const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
+
     const loginHandler = () => {
         navigation.replace('Login');
     }
 
     const signupHandler = async () => {
+        if (username === ''){
+            Alert.alert('Username cannot be empty');
+            return;
+        }
         if (email === ''){
             Alert.alert('Email cannot be empty');
             return;
@@ -29,9 +46,14 @@ const SignupScreen = ({navigation}) => {
             return;
         }
         createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             const user = userCredential.user;
             console.log("User created: ", user);
+
+            // Add user data to Firestore collection
+            const userData = { username: username, email: email };
+            await writeWithIdToDB(userData, 'User', user.uid);
+
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -52,7 +74,17 @@ const SignupScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text>Sigup</Text>
+      <Text>Signup</Text>
+        <TextInput
+            placeholder="Username"
+            value={username}
+            onChangeText={changedText => setUsername(changedText)}
+            style={{
+                height: 40,
+                borderColor: 'gray',
+                borderWidth: 1
+            }}
+        />
         <TextInput
             placeholder="Email"
             value={email}
@@ -97,7 +129,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        //alignItems: 'center',
         justifyContent: 'center',
         padding: 20
     }

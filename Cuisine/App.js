@@ -19,6 +19,7 @@ import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './Firebase/firebaseSetup'
+import { useEffect, useState } from 'react';
 
 
 // Create navigators
@@ -69,19 +70,13 @@ const AppStack = (
     <Stack.Screen name="Edit Post" component={PostEditorScreen} />
     <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
     <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
-    <Stack.Screen name="Profile" component={ProfileScreen} options={{
-      headerRight: () => (
-        <PressableButton onPress={() => signOut(auth)}>
-          <AntDesign name="logout" size={24} color="black" />
-        </PressableButton>
-      ),
-    }} />
+    <Stack.Screen name="Profile" component={ProfileScreen} />
   </>
 );
 
 export default function App() {
-  const [isUserAuthenticated, setIsUserAuthenticated] = React.useState(false);
-  React.useEffect(() => {
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsUserAuthenticated(!!user);
     });
