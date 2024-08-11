@@ -1,27 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
 import { getUserInfoDB } from '../Firebase/firestoreHelper';
-
-const userId = 'j3lDxeV4xis2aSngmgyU';
+import { auth } from '../Firebase/firebaseSetup';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userData = await getUserInfoDB(userId);
-      setUserInfo(userData);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setLoading(false);
-    };
+    });
 
-    fetchUserInfo();
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      const fetchUserInfo = async () => {
+        console.log(user.uid);
+        const userData = await getUserInfoDB(user.uid);
+        setUserInfo(userData);
+      };
+      fetchUserInfo();
+    }
+  }, [user]);
 
   const handleNewPost = () => {
     navigation.navigate('New Post');
@@ -43,6 +54,14 @@ const ProfileScreen = () => {
     navigation.navigate('Edit Profile');
   };
 
+  const handleLogin = () => {
+    navigation.navigate('Login');
+  };
+
+  const handleSignup = () => {
+    navigation.navigate('Signup');
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -50,18 +69,25 @@ const ProfileScreen = () => {
       </View>
     );
   }
-  console.log(userInfo);
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.profileName}>Welcome! Please log in or sign up to access your profile.</Text>
+        <Button title="Login" onPress={handleLogin} />
+        <Button title="Signup" onPress={handleSignup} />
+      </View>
+    );
+  }
 
   return (
-    
     <View style={styles.container}>
       <Image
-        source={{ uri: userInfo.photoUrl || 'https://via.placeholder.com/150' }}
+        source={{ uri: userInfo?.photoUrl || 'https://via.placeholder.com/150' }}
         style={styles.profilePicture}
       />
-      <Text style={styles.profileName}>{userInfo.name || 'User Name'}</Text>
-      {/* {TO_DO: Update the user email to be the one from auth} */}
-      <Text style={styles.profileName}>{userInfo.email || 'User Email'}</Text>
+      <Text style={styles.profileName}>{userInfo?.name || 'User Name'}</Text>
+      <Text style={styles.profileName}>{auth.currentUser.email || 'User Email'}</Text>
       <View style={styles.editButtonContainer}>
         <PressableButton onPress={handleEditProfile}>
           <Ionicons name="pencil" size={24} color={colors.primary} />
@@ -92,6 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,

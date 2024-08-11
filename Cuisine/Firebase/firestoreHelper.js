@@ -1,4 +1,4 @@
-import { addDoc, deleteDoc, updateDoc, collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc, collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from './firebaseSetup';
 
 
@@ -35,16 +35,26 @@ export async function getUserInfoDB(userId) {
     }
   }
 
-  export async function getSavedPosts(userId) {
-    try {
-        const savedPostsCollection = collection(database, `User/${userId}/SavedPosts`);
-        const savedPostsSnapshot = await getDocs(savedPostsCollection);
-        const savedPostIds = savedPostsSnapshot.docs.map(doc => doc.data().PostID);
-        return savedPostIds;
-    } catch (e) {
-        console.error('Error getting saved posts: ', e);
-    }
+export async function getSavedPosts(userId) {
+  try {
+      const savedPostsCollection = collection(database, `User/${userId}/SavedPosts`);
+      const savedPostsSnapshot = await getDocs(savedPostsCollection);
+      const savedPostIds = savedPostsSnapshot.docs.map(doc => doc.data().PostID);
+      return savedPostIds;
+  } catch (e) {
+      console.error('Error getting saved posts: ', e);
+  }
 }
+
+export async function writeWithIdToDB(data, collectionName, id){
+  try{
+      await setDoc(doc(database, collectionName, id), data, {merge: true});
+  }
+  catch(e) {
+      console.error("Writing to database with id error: ", e);
+  }
+}
+
 
 
 

@@ -27,7 +27,7 @@ const PostItem = ({ item }) => {
   return (
     <View style={styles.card}>
     <Pressable   onPress={handlePostPress}>
-      <Image source={{ uri: item.images[0] }} style={styles.cardImage} />
+      {/* <Image source={{ uri: item.images[0] }} style={styles.cardImage} /> */}
       <Text style={styles.cardTitle}>{item.title}</Text>
       </Pressable>
       <View style={styles.cardFooter}>

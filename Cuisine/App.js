@@ -15,6 +15,11 @@ import PostEditorScreen from './screens/PostEditorScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import FoodJournalScreen from './screens/FoodJournalScreen';
 import SavedPostsScreen from './screens/SavedPostsScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { auth } from './Firebase/firebaseSetup'
+
 
 // Create navigators
 const Stack = createNativeStackNavigator();
@@ -47,22 +52,46 @@ function Tabs() {
     </Tab.Navigator>
   );
 }
+
+const AuthStack = (
+  <>
+    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Signup" component={SignupScreen} />
+  </>
+);
+
+const AppStack = (
+  <>
+    <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
+    <Stack.Screen name="Post" component={PostScreen} options={{ title: 'Post Details' }} />
+    <Stack.Screen name="Restaurant" component={RestaurantScreen} options={{ title: 'Restaurant Details' }} />
+    <Stack.Screen name="New Post" component={PostEditorScreen} />
+    <Stack.Screen name="Edit Post" component={PostEditorScreen} />
+    <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
+    <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
+    <Stack.Screen name="Profile" component={ProfileScreen} options={{
+      headerRight: () => (
+        <PressableButton onPress={() => signOut(auth)}>
+          <AntDesign name="logout" size={24} color="black" />
+        </PressableButton>
+      ),
+    }} />
+  </>
+);
+
 export default function App() {
+  const [isUserAuthenticated, setIsUserAuthenticated] = React.useState(false);
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsUserAuthenticated(!!user);
+    });
+
+    return () => unsubscribe();
+  }, []);
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={({ route }) => ({
-        ...screenOptions,
-        contentStyle: {
-          backgroundColor: "white",
-        },
-      })}>
-        <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
-        <Stack.Screen name="Post" component={PostScreen} options={{ title: 'Post Details' }} />
-        <Stack.Screen name="Restaurant" component={RestaurantScreen} options={{ title: 'Restaurant Details' }} />
-        <Stack.Screen name="New Post" component={PostEditorScreen} />
-        <Stack.Screen name="Edit Post" component={PostEditorScreen} />
-        <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
-        <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
+      <Stack.Navigator>
+        {isUserAuthenticated ? AppStack : AuthStack}
       </Stack.Navigator>
     </NavigationContainer>
   );
