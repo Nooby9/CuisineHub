@@ -3,7 +3,6 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, Image, StyleSheet } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { screenOptions } from './style';
@@ -17,17 +16,14 @@ import FoodJournalScreen from './screens/FoodJournalScreen';
 import SavedPostsScreen from './screens/SavedPostsScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
-import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { auth } from './Firebase/firebaseSetup'
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './Firebase/firebaseSetup';
 import { useEffect, useState } from 'react';
 
-
-// Create navigators
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Tab navigator component
-function Tabs() {
+function Tabs({ isUserAuthenticated }) {
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       ...screenOptions,
@@ -47,18 +43,18 @@ function Tabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={isUserAuthenticated ? ProfileScreen : AuthStack}
         options={{ tabBarIcon: ({ color, size }) => (<Ionicons name="person-outline" size={24} color="black" />) }}
       />
     </Tab.Navigator>
   );
 }
 
-const AuthStack = (
-  <>
+const AuthStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Signup" component={SignupScreen} />
-  </>
+  </Stack.Navigator>
 );
 
 const AppStack = (
@@ -70,12 +66,12 @@ const AppStack = (
     <Stack.Screen name="Edit Post" component={PostEditorScreen} />
     <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
     <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
-    <Stack.Screen name="Profile" component={ProfileScreen} />
   </>
 );
 
 export default function App() {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsUserAuthenticated(!!user);
@@ -83,20 +79,12 @@ export default function App() {
 
     return () => unsubscribe();
   }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {isUserAuthenticated ? AppStack : AuthStack}
+        {isUserAuthenticated ? AppStack : <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
