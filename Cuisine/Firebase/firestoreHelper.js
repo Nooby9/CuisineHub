@@ -1,5 +1,6 @@
 import { addDoc, deleteDoc, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { database } from './firebaseSetup';
+import { firestore } from './firebaseSetup'; // Ensure correct Firebase import
 
 // Function to fetch array data (e.g., likedBy) from a specific document
 export const fetchArrayDataByField = async (collectionName, docId, field) => {
@@ -99,8 +100,8 @@ export async function getUserName(userId) {
           const userData = userDoc.data();  // Ensure userData is defined here
 
           // Return the user's name if it exists
-          if (userData.name) {
-              return userData.name;
+          if (userData.username) {
+              return userData.username;
           } 
       } else {
           console.error('No such user!');
@@ -111,6 +112,21 @@ export async function getUserName(userId) {
       return null;
   }
 }
+
+export const deleteFromDB = async (docId, collectionName) => {
+    try {
+         // Get a reference to the document you want to delete
+         const docRef = doc(database, collectionName, docId);
+         // Delete the document
+         await deleteDoc(docRef);
+         
+         console.log('Document successfully deleted!');
+    } catch (error) {
+        console.error('Error removing document: ', error);
+        throw error;
+    }
+};
+
 
 
 
