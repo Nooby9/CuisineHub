@@ -5,23 +5,34 @@ import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
 import { getUserInfoDB } from '../Firebase/firestoreHelper';
-
-const userId = 'j3lDxeV4xis2aSngmgyU';
+import { auth } from '../Firebase/firebaseSetup';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userData = await getUserInfoDB(userId);
-      setUserInfo(userData);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setLoading(false);
-    };
+    });
 
-    fetchUserInfo();
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      const fetchUserInfo = async () => {
+        console.log(user.uid);
+        const userData = await getUserInfoDB(user.uid);
+        setUserInfo(userData);
+      };
+      fetchUserInfo();
+    }
+  }, [user]);
 
   const handleNewPost = () => {
     navigation.navigate('New Post');
@@ -50,18 +61,15 @@ const ProfileScreen = () => {
       </View>
     );
   }
-  console.log(userInfo);
 
   return (
-    
     <View style={styles.container}>
       <Image
-        source={{ uri: userInfo.photoUrl || 'https://via.placeholder.com/150' }}
+        source={{ uri: userInfo?.photoUrl || 'https://via.placeholder.com/150' }}
         style={styles.profilePicture}
       />
-      <Text style={styles.profileName}>{userInfo.name || 'User Name'}</Text>
-      {/* {TO_DO: Update the user email to be the one from auth} */}
-      <Text style={styles.profileName}>{userInfo.email || 'User Email'}</Text>
+      <Text style={styles.profileName}>{userInfo?.username || 'User Name'}</Text>
+      <Text style={styles.profileName}>{auth.currentUser.email || 'User Email'}</Text>
       <View style={styles.editButtonContainer}>
         <PressableButton onPress={handleEditProfile}>
           <Ionicons name="pencil" size={24} color={colors.primary} />
@@ -83,6 +91,16 @@ const ProfileScreen = () => {
       <TouchableOpacity style={styles.actionButton} onPress={handleNotifications}>
         <Text style={styles.actionText}>Notifications</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.signoutButton} onPress={()=>{
+          try{
+            signOut(auth);
+          } catch (error) {
+            console.log("Error signing out: ", error);
+          }
+        }}>
+        <Text style={styles.signoutText}>Sign Out</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -92,6 +110,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,
@@ -125,6 +144,18 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 16,
     color: '#333',
+  },
+  signoutButton: {
+    backgroundColor: 'red',
+    padding: 15,
+    marginTop: 10,
+    width: '90%',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  signoutText: {
+    fontSize: 16,
+    color: 'white',
   },
 });
 
