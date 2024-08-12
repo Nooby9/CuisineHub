@@ -28,7 +28,7 @@ const ProfileScreen = () => {
   };
 
   const handleFoodJournal = () => {
-    navigation.navigate('Food Journal');
+    navigation.navigate('Personal Food Journal');
   };
 
   const handleSavedPosts = () => {
