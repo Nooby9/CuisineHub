@@ -5,6 +5,7 @@ import { subscribeToCollection } from '../Firebase/firestoreHelper';
 import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
 import { database } from '../Firebase/firebaseSetup';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
+import { useNavigation  } from '@react-navigation/native';
 
 
 // Define collection name
@@ -12,6 +13,11 @@ const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
 const DiscoverScreen = () => {
   const [posts, setPosts] = useState([]);
+  const navigation = useNavigation();
+
+  function getPostDetailPress(post){
+    navigation.navigate('Post', { post});
+  }
 
 
   useEffect(() => {
@@ -43,7 +49,7 @@ const DiscoverScreen = () => {
     <View style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={({ item }) => <PostItem item={item} />}
+        renderItem={({ item }) => <PostItem item={item} onPress={getPostDetailPress}/>}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.columnWrapper}

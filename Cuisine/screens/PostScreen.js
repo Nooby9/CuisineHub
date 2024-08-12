@@ -47,12 +47,6 @@ const PostScreen = ({ route }) => {
       fetchLikeData();
     }, []);
   
-//     useFocusEffect(
-//       React.useCallback(() => {
-//           fetchLikeData();
-//       }, [item.id])
-//   );
-  
     // Function to handle the like button press
     const handleLikePress = async () => {
       const newFavoriteState = !isFavorite; // Toggle the favorite state
@@ -67,26 +61,6 @@ const PostScreen = ({ route }) => {
         // Optionally handle error, e.g., rollback the like count in UI
       }
     };
-    // Set up the header right button
-    // useEffect(() => {
-    //     navigation.setOptions({
-    //         headerRight: () => (
-    //             <View style={commonStyles.likeSection}>
-    //       <PressableButton onPress={handleLikePress}>
-    //       <Icon
-    //       name={isFavorite ? 'heart' : 'heart-outline'} // Toggle between filled and outline
-    //       size={18}
-    //       color={isFavorite ? colors.favorite : colors.notFavorite} // Toggle color
-    //     />
-    //       </PressableButton>
-    //       <Text style={commonStyles.cardLikes}>{likesCount}</Text>
-    //     </View>
-    //         ),
-    //     });
-    // }, [navigation, isFavorite]);
-
-    // useEffect to check if the user has already liked the post
-  
 
     // useEffect to fetch restaurant details based on place_id from the post data
     useEffect(() => {
