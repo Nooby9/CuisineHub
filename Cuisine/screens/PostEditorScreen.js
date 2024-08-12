@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { writeToDB } from '../Firebase/firestoreHelper';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { getUserName, writeToDB, deleteFromDB } from '../Firebase/firestoreHelper';
 import { storage } from '../Firebase/firebaseSetup'; // Your Firebase storage setup
 import PressableButton from '../components/PressableButton';
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the ImagePickerComponent
 import { googlePlacesApiKey } from '@env'; // Import your Google Places API key
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
+import { fetchImageUrls } from '../utils/CommonMethod'; // Adjust the path as needed
+
 
 // Define collection name
 const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
@@ -21,7 +23,88 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState(''); // State to store search query
     const [restaurants, setRestaurants] = useState([]); // State to store search results
     const [showDropdown, setShowDropdown] = useState(false);
+    const [pendingDeletions, setPendingDeletions] = useState([]); // Track pending deletions
     const [author, setAuthor] = useState('');
+    const { post, mode } = route.params || {};
+
+    //TODO: use this after supporting authentication
+    // const currentUserId = auth.currentUser.uid; 
+    const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
+
+
+    // Pre-fill the fields if we're in edit mode
+    useEffect(() => {
+        async function prefillFields() {
+            if (mode === 'edit' && post) {
+                try {
+                    // Pre-fill the fields with post data
+                    setTitle(post.title);
+                    setContent(post.comment);
+                    setPlaceId(post.place_id);
+                    setSearchQuery(post.placeDetails ? post.placeDetails.name : '');
+                    setAuthor(post.author);
+
+                    // Add delete button to the header
+                    navigation.setOptions({
+                        headerRight: () => (
+                            <Pressable onPress={handleDelete}>
+                                <Ionicons name="trash-outline" size={24} color="white" style={{ marginRight: 15 }} />
+                            </Pressable>
+                        ),
+                    });
+
+                    // Fetch image URLs from Firebase Storage
+                    const urls = await fetchImageUrls(post.imageUrls);
+                    setImages(urls);
+
+
+                } catch (error) {
+                    console.error('Error pre-filling fields:', error);
+                }
+            }
+        }
+
+        prefillFields();
+    }, [mode, post, navigation]);
+
+    const handleDelete = () => {
+        Alert.alert(
+            "Delete Post",
+            "Are you sure you want to delete this post?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            // Delete images from Firebase Storage
+                            await Promise.all(post.imageUrls.map(imagePath => deleteImageFromStorage(imagePath)));
+
+                            // Delete post from Firestore
+                            await deleteFromDB(post.id, FIREBASE_COLLECTIONS.POSTS);
+
+                            Alert.alert('Post deleted successfully');
+                            navigation.goBack();
+                        } catch (error) {
+                            console.error("Error deleting post: ", error);
+                            Alert.alert("Delete Failed", "There was an error deleting the post.");
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    async function deleteImageFromStorage(imageUrl) {
+        try {
+            const imageRef = ref(storage, imageUrl);
+            console.log("imageRef", imageRef)
+            await deleteObject(imageRef);
+        } catch (error) {
+            console.error("Error deleting image: ", error);
+        }
+    }
 
     // Callback function to handle image selection
     const handleImageSelect = (uris) => {
@@ -86,208 +169,226 @@ const PostEditorScreen = ({ navigation, route }) => {
         }
 
         // Use "Anonymous" if author is empty
-        const authorName = author || 'Anonymous';
+        const authorName = await getUserName(currentUserId);
+        if (!authorName) {
+            authorName = "Anonymous";
+        }
 
         try {
+            // Delete pending images from storage
+            await Promise.all(pendingDeletions.map(deleteImageFromStorage));
+
             // Upload images and get their URLs
             const imageUrls = await Promise.all(images.map(imageUri => uploadImageToStorage(imageUri)));
             // Prepare the post data
             const postData = {
                 title,
-                imageUrls:imageUrls,
+                imageUrls: imageUrls,
                 place_id: placeId,
                 author: authorName,
                 comment: content,
-                likes: 0,
+                likedBy: [],
                 date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
                 comments: [],
             };
 
-           
-                // Write to Firestore
-                await writeToDB(postData, COLLECTION_NAME);
-                Alert.alert('Success', 'Post has been successfully submitted.');
 
-                // Navigate back to the previous screen after submission
-                navigation.goBack();
-            } catch (error) {
-                console.error('Error writing to Firestore: ', error);
-                Alert.alert('Error', 'An error occurred while submitting your post.');
-            }
-        };
+            // Write to Firestore
+            await writeToDB(postData, COLLECTION_NAME);
+            Alert.alert('Success', 'Post has been successfully submitted.');
 
-        async function uploadImageToStorage(imageUri) {
-            try {
-                // Fetch the image data
-                const response = await fetch(imageUri);
-                if (!response.ok) {
-                    throw new Error("The fetch imgae request was not successful");
-                }
-                const blob = await response.blob();
-                console.log(blob);
-                // Create a reference to the Firebase Storage
-                const imageName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-                const imageRef = ref(storage, `images/${imageName}`);
-
-                // Upload the blob to Firebase Storage
-                const uploadResult = await uploadBytesResumable(imageRef, blob);
-                console.log("fullpath:", uploadResult.metadata.fullPath)
-                // Store the image URI in Firestore
-                return uploadResult.metadata.fullPath;
-            } catch (error) {
-                console.error("Error uploading image: ", error);
-                Alert.alert("Upload Failed", "There was an error uploading the image.");
-            }
+            // Navigate back to the previous screen after submission
+            navigation.goBack();
+        } catch (error) {
+            console.error('Error writing to Firestore: ', error);
+            Alert.alert('Error', 'An error occurred while submitting your post.');
         }
-
-        return (
-            <View style={styles.container}>
-
-                {/* Search for Restaurants */}
-                <View style={styles.searchContainer}>
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search for a restaurant..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                    />
-                    <PressableButton onPress={handleSearchPress}>
-                        <Ionicons name="search" size={24} color="black" />
-                    </PressableButton>
-                </View>
-
-                {/* Dropdown for Search Results */}
-                {showDropdown && (
-                    <FlatList
-                        data={restaurants}
-                        keyExtractor={(item) => item.place_id}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={styles.dropdownItem}
-                                onPress={() => handleSelectRestaurant(item)}
-                            >
-                                <Text style={styles.dropdownText}>{item.name}</Text>
-                            </TouchableOpacity>
-                        )}
-                        style={styles.dropdown}
-                    />
-                )}
-
-                {/* Title Input */}
-                <TextInput
-                    style={styles.input}
-                    placeholder="Title"
-                    value={title}
-                    onChangeText={setTitle}
-                />
-
-                {/* Content Input */}
-                <TextInput
-                    style={[styles.input, styles.textArea]}
-                    placeholder="Content"
-                    value={content}
-                    onChangeText={setContent}
-                    multiline
-                    numberOfLines={4}
-                />
-                {/* Image Picker */}
-                <ImagePickerComponent onImageSelect={handleImageSelect} />
-
-                {/* Post Button */}
-                <View style={styles.buttonContainer}>
-                    <Pressable
-                        style={({ pressed }) => [
-                            styles.postButton,
-                            pressed && styles.pressedStyle,
-                        ]}
-                        onPress={handleSubmit}
-                    >
-                        <Text style={styles.postButtonText}>
-                            {route.name === 'New Post' ? 'Post' : 'Confirm Edit'}
-                        </Text>
-                    </Pressable>
-                </View>
-
-            </View>
-        );
     };
 
-    // Styles for the screen
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            padding: 20,
-            backgroundColor: '#fff',
-        },
-        input: {
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 5,
-            padding: 10,
-            marginBottom: 15,
-        },
-        textArea: {
-            // flex: 1,
-            height: 80,
-            textAlignVertical: 'top',
-        },
-        searchContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 15,
-        },
-        searchInput: {
-            flex: 1,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 5,
-            padding: 10,
-            marginRight: 5
-        },
-        dropdown: {
-            maxHeight: 200,
-            minHeight: 200,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 5,
-            marginTop: 5,
-        },
-        dropdownItem: {
-            padding: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: '#eee',
-        },
-        dropdownText: {
-            fontSize: 16,
-        },
-        buttonContainer: {
-            alignSelf: 'center', // Center the button horizontally
-            marginBottom: 20, // Add margin from the bottom
-            width: '100%', // Take the full width
-            position: 'absolute',
-            bottom: 20,
-            paddingHorizontal: 40, // Add padding on both sides
-        },
-        postButton: {
-            height: 40,
-            backgroundColor: '#ff3b30',
-            borderRadius: 25,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.3,
-            shadowRadius: 3,
-            elevation: 5,
-        },
-        pressedStyle: {
-            opacity: 0.8,
-        },
-        postButtonText: {
-            color: '#ffffff',
-            fontSize: 18,
-            fontWeight: 'bold',
-        },
-    });
+    // Callback function to handle image removal
+    const handleImageRemove = (uri, isStoredInStorage) => {
+        if (isStoredInStorage) {
+          setPendingDeletions((prev) => [...prev, uri]);
+        }
+      };    
 
-    export default PostEditorScreen;
+    async function uploadImageToStorage(imageUri) {
+        try {
+            // Fetch the image data
+            const response = await fetch(imageUri);
+            if (!response.ok) {
+                throw new Error("The fetch imgae request was not successful");
+            }
+            const blob = await response.blob();
+            console.log(blob);
+            // Create a reference to the Firebase Storage
+            const imageName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+            const imageRef = ref(storage, `images/${imageName}`);
+
+            // Upload the blob to Firebase Storage
+            const uploadResult = await uploadBytesResumable(imageRef, blob);
+            console.log("fullpath:", uploadResult.metadata.fullPath)
+            // Store the image URI in Firestore
+            return uploadResult.metadata.fullPath;
+        } catch (error) {
+            console.error("Error uploading image: ", error);
+            Alert.alert("Upload Failed", "There was an error uploading the image.");
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+
+            {/* Search for Restaurants */}
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search for a restaurant..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+                <PressableButton onPress={handleSearchPress}>
+                    <Ionicons name="search" size={24} color="black" />
+                </PressableButton>
+            </View>
+
+            {/* Dropdown for Search Results */}
+            {showDropdown && (
+                <FlatList
+                    data={restaurants}
+                    keyExtractor={(item) => item.place_id}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={styles.dropdownItem}
+                            onPress={() => handleSelectRestaurant(item)}
+                        >
+                            <Text style={styles.dropdownText}>{item.name}</Text>
+                        </TouchableOpacity>
+                    )}
+                    style={styles.dropdown}
+                />
+            )}
+
+            {/* Title Input */}
+            <TextInput
+                style={styles.input}
+                placeholder="Title"
+                value={title}
+                onChangeText={setTitle}
+            />
+
+            {/* Content Input */}
+            <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Content"
+                value={content}
+                onChangeText={setContent}
+                multiline
+                numberOfLines={4}
+            />
+            {/* Image Picker */}
+            <ImagePickerComponent
+                initialImages={images}
+                onImageSelect={handleImageSelect}
+                onRemoveImage={handleImageRemove}
+                isEditMode={mode === 'edit'}
+            />
+
+            {/* Post Button */}
+            <View style={styles.buttonContainer}>
+                <Pressable
+                    style={({ pressed }) => [
+                        styles.postButton,
+                        pressed && styles.pressedStyle,
+                    ]}
+                    onPress={handleSubmit}
+                >
+                    <Text style={styles.postButtonText}>
+                        {route.name === 'New Post' ? 'Post' : 'Confirm Edit'}
+                    </Text>
+                </Pressable>
+            </View>
+
+        </View>
+    );
+};
+
+// Styles for the screen
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#fff',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 15,
+    },
+    textArea: {
+        // flex: 1,
+        height: 80,
+        textAlignVertical: 'top',
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    searchInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 5
+    },
+    dropdown: {
+        maxHeight: 200,
+        minHeight: 200,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        marginTop: 5,
+    },
+    dropdownItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    dropdownText: {
+        fontSize: 16,
+    },
+    buttonContainer: {
+        alignSelf: 'center', // Center the button horizontally
+        marginBottom: 20, // Add margin from the bottom
+        width: '100%', // Take the full width
+        position: 'absolute',
+        bottom: 20,
+        paddingHorizontal: 40, // Add padding on both sides
+    },
+    postButton: {
+        height: 40,
+        backgroundColor: '#ff3b30',
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 5,
+    },
+    pressedStyle: {
+        opacity: 0.8,
+    },
+    postButtonText: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+});
+
+export default PostEditorScreen;
