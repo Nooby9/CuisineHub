@@ -23,14 +23,16 @@ import { useEffect, useState } from 'react';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function Tabs({ isUserAuthenticated }) {
+function Tabs() {
   return (
-    <Tab.Navigator screenOptions={({ route }) => ({
-      ...screenOptions,
-      contentStyle: {
-        backgroundColor: "white",
-      },
-    })}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        ...screenOptions,
+        contentStyle: {
+          backgroundColor: "white",
+        },
+      })}
+    >
       <Tab.Screen
         name="Discover"
         component={DiscoverScreen}
@@ -43,7 +45,7 @@ function Tabs({ isUserAuthenticated }) {
       />
       <Tab.Screen
         name="Profile"
-        component={isUserAuthenticated ? ProfileScreen : AuthStack}
+        component={ProfileScreen}
         options={{ tabBarIcon: ({ color, size }) => (<Ionicons name="person-outline" size={24} color="black" />) }}
       />
     </Tab.Navigator>
@@ -73,17 +75,19 @@ export default function App() {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
       setIsUserAuthenticated(!!user);
     });
-
-    return () => unsubscribe();
   }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {isUserAuthenticated ? AppStack : <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />}
+        {isUserAuthenticated ? (
+          AppStack
+        ) : (
+          <Stack.Screen name="Auth" component={AuthStack} options={{ headerShown: false }} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

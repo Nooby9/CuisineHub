@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,28 +54,10 @@ const ProfileScreen = () => {
     navigation.navigate('Edit Profile');
   };
 
-  const handleLogin = () => {
-    navigation.navigate('Login');
-  };
-
-  const handleSignup = () => {
-    navigation.navigate('Signup');
-  };
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.profileName}>Welcome! Please log in or sign up to access your profile.</Text>
-        <Button title="Login" onPress={handleLogin} />
-        <Button title="Signup" onPress={handleSignup} />
       </View>
     );
   }
@@ -112,7 +94,7 @@ const ProfileScreen = () => {
 
       <TouchableOpacity style={styles.signoutButton} onPress={()=>{
           try{
-            signOut(auth)
+            signOut(auth);
           } catch (error) {
             console.log("Error signing out: ", error);
           }

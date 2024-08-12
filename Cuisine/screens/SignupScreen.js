@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { auth } from '../Firebase/firebaseSetup'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { database } from '../Firebase/firebaseSetup' 
@@ -15,10 +15,10 @@ export async function writeWithIdToDB(data, collectionName, id){
 }
 
 const SignupScreen = ({navigation}) => {
-    const [username, setUsername] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const loginHandler = () => {
         navigation.replace('Login');
@@ -50,7 +50,6 @@ const SignupScreen = ({navigation}) => {
             const user = userCredential.user;
             console.log("User created: ", user);
 
-            // Add user data to Firestore collection
             const userData = { username: username, email: email };
             await writeWithIdToDB(userData, 'User', user.uid);
 
