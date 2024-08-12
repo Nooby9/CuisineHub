@@ -61,7 +61,7 @@ export default function App() {
         <Stack.Screen name="Restaurant" component={RestaurantScreen} options={{ title: 'Restaurant Details' }} />
         <Stack.Screen name="New Post" component={PostEditorScreen} />
         <Stack.Screen name="Edit Post" component={PostEditorScreen} />
-        <Stack.Screen name="Food Journal" component={FoodJournalScreen} />
+        <Stack.Screen name="Personal Food Journal" component={FoodJournalScreen} />
         <Stack.Screen name="Saved Posts" component={SavedPostsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
