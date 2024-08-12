@@ -12,13 +12,12 @@ import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHe
 // Define collection name
 const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
-const PostItem = ({ item }) => {
+const PostItem = ({ item, onPress }) => {
   // State to store the number of likes (size of likedBy array)
   const [likesCount, setLikesCount] = useState(0);
   const [imageUrl, setImageUrl] = useState(null);
   // State to track if the post is liked by the current user
   const [isFavorite, setIsFavorite] = useState(false);
-  const navigation = useNavigation();
   //TODO: use this after supporting authentication
   // const currentUserId = auth.currentUser.uid; 
   const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
@@ -79,13 +78,10 @@ const PostItem = ({ item }) => {
     }
   };
 
-  const handlePostPress = () => {
-    navigation.navigate('Post', { post: item });
-  };
 
   return (
     <View style={styles.card}>
-      <Pressable onPress={handlePostPress}>
+      <Pressable onPress={()=>onPress(item)}>
         <Image source={{ uri: imageUrl || 'fallback_image_url' }} style={styles.cardImage} />
         <Text style={styles.cardTitle}>{item.title}</Text>
       </Pressable>
