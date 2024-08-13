@@ -76,20 +76,6 @@ const PostScreen = ({ route }) => {
     }, [post.place_id]);
 
     // useEffect to fetch image URLs from Firebase Storage
-    // async function fetchImageUrls() {
-    //     try {
-    //         const urls = await Promise.all(
-    //             post.imageUrls.map(async (imageUri) => {
-    //                 const imageRef = ref(storage, imageUri);
-    //                 const url = await getDownloadURL(imageRef);
-    //                 return url;
-    //             })
-    //         );
-    //         setImageUrls(urls);
-    //     } catch (error) {
-    //         console.error('Error fetching image URLs: ', error);
-    //     }
-    // }
     useEffect(() => {
         const fetchImages = async () => {
             try {
@@ -226,13 +212,18 @@ const PostScreen = ({ route }) => {
                     ))}
                 </View>
             </ScrollView>
-            <Pressable style={styles.fab} onPress={handleLikePress}>
-                <Icon
-                    name={isFavorite ? 'heart' : 'heart-outline'}
-                    size={28}
-                    color={isFavorite ? colors.favorite : colors.notFavorite}
-                />
-            </Pressable>
+            <View style={commonStyles.likeSection}>
+                <Pressable style={styles.fab} onPress={handleLikePress}>
+                    <View style={styles.iconContainer}>
+                        <Icon
+                            name={isFavorite ? 'heart' : 'heart-outline'}
+                            size={26}
+                            color={isFavorite ? colors.favorite : colors.notFavorite}
+                        />
+                        <Text style={styles.likesCount}>{likesCount}</Text>
+                    </View>
+                </Pressable>
+            </View>
         </View>
     );
 };
@@ -326,9 +317,22 @@ const styles = StyleSheet.create({
         right: 20,
         backgroundColor: 'paleturquoise',
         borderRadius: 50,
-        padding: 15,
+        width: 60, // Adjust the width to ensure it remains circular
+        height: 60, // Ensure the height is the same as the width for circular shape
         elevation: 5,
+        alignItems: 'center', // Center content horizontally
+        justifyContent: 'center', // Center content vertically
     },
+    iconContainer: {
+        alignItems: 'center', // Center the icon and text vertically
+        justifyContent: 'center',
+    },
+    likesCount: {
+        fontSize: 12,
+        color: '#777',
+        marginTop: 2, // Small margin between the icon and the text
+    },
+    
     addCommentSection: {
         flexDirection: 'row',
         alignItems: 'center',
