@@ -1,14 +1,14 @@
 // PostScreen.js
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, FlatList, TextInput,Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, FlatList, TextInput, Alert } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
-import { getUserName,updateDB } from '../Firebase/firestoreHelper';
+import { getUserName, updateDB } from '../Firebase/firestoreHelper';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../Firebase/firebaseSetup';
-import { fetchPlaceDetails } from '../utils/CommonMethod';
+import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
@@ -76,22 +76,31 @@ const PostScreen = ({ route }) => {
     }, [post.place_id]);
 
     // useEffect to fetch image URLs from Firebase Storage
+    // async function fetchImageUrls() {
+    //     try {
+    //         const urls = await Promise.all(
+    //             post.imageUrls.map(async (imageUri) => {
+    //                 const imageRef = ref(storage, imageUri);
+    //                 const url = await getDownloadURL(imageRef);
+    //                 return url;
+    //             })
+    //         );
+    //         setImageUrls(urls);
+    //     } catch (error) {
+    //         console.error('Error fetching image URLs: ', error);
+    //     }
+    // }
     useEffect(() => {
-        async function fetchImageUrls() {
+        const fetchImages = async () => {
             try {
-                const urls = await Promise.all(
-                    post.imageUrls.map(async (imageUri) => {
-                        const imageRef = ref(storage, imageUri);
-                        const url = await getDownloadURL(imageRef);
-                        return url;
-                    })
-                );
+                const urls = await fetchImageUrls(post.imageUrls);
                 setImageUrls(urls);
             } catch (error) {
-                console.error('Error fetching image URLs: ', error);
+                console.error('Error fetching image for post detail:', error);
             }
-        }
-        fetchImageUrls();
+        };
+
+        fetchImages();
     }, [post.imageUrls]);
 
     const handlePress = () => {
