@@ -136,7 +136,7 @@ const PostScreen = ({ route }) => {
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
-        
+
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
 
@@ -215,6 +215,11 @@ const PostScreen = ({ route }) => {
                     <Text style={styles.restaurantAddress}>{restaurant.formatted_address}</Text>
                 </View>
 
+                {/* Title Section */}
+                <View style={styles.titleSection}>
+                    <Text style={styles.title}>{post.title}</Text>
+                </View>
+
                 <View style={styles.commentSection}>
 
                     <Text style={styles.comment}>{post.comment}</Text>
@@ -285,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     comment: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#333',
     },
     restaurantSection: {
@@ -320,7 +325,7 @@ const styles = StyleSheet.create({
         color: '#777',
     },
     date: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#777',
         alignItems: 'center',
         marginHorizontal: 15
@@ -328,6 +333,18 @@ const styles = StyleSheet.create({
     location: {
         fontSize: 14,
         color: '#777',
+    },
+    titleSection: {
+        padding: 10,
+        backgroundColor: '#fff',
+    },
+    
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        textAlign: 'left',
     },
     commentsSection: {
         padding: 15,
