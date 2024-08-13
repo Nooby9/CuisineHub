@@ -146,7 +146,6 @@ const PostEditorScreen = ({ navigation, route }) => {
     // Function to handle post submission
     const handleSubmit = async () => {
         if (isSubmitting) return; // Prevent double submission
-        setIsSubmitting(true);
 
         // Check if the title is empty
         if (!title.trim()) {
@@ -171,6 +170,7 @@ const PostEditorScreen = ({ navigation, route }) => {
             Alert.alert('No Restaurant Selected', 'Please select a restaurant from the search results.');
             return;
         }
+        setIsSubmitting(true);
 
         // Use "Anonymous" if author is empty
         const authorName = await getUserName(currentUserId);
@@ -186,17 +186,34 @@ const PostEditorScreen = ({ navigation, route }) => {
 
             // Upload images and get their URLs
             const imageUrls = await Promise.all(images.map(imageUri => uploadImageToStorage(imageUri)));
-            // Prepare the post data
-            const postData = {
-                title,
-                imageUrls: imageUrls,
-                place_id: placeId,
-                author: authorName,
-                comment: content,
-                likedBy: [],
-                date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
-                comments: [],
-            };
+
+            let postData;
+
+            if (mode === 'edit' && post.id) {
+                // Retain the existing likedBy, date, and comments when editing
+                postData = {
+                    title,
+                    imageUrls: imageUrls,
+                    place_id: placeId,
+                    author: authorName,
+                    comment: content,
+                    likedBy: post.likedBy, // Retain existing likedBy
+                    date: post.date, // Retain existing date
+                    comments: post.comments, // Retain existing comments
+                };
+            } else {
+                // Prepare the post data
+                const postData = {
+                    title,
+                    imageUrls: imageUrls,
+                    place_id: placeId,
+                    author: authorName,
+                    comment: content,
+                    likedBy: [],
+                    date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+                    comments: [],
+                };
+            }
 
 
             if (mode === 'edit' && post.id) {
