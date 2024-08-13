@@ -64,6 +64,17 @@ export async function deleteWithIdFromDB(collectionName, id){
   }
 }
 
+export async function checkIfDocExists(collectionName, id){
+  try{
+      const docRef = doc(database, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      return docSnap.exists();
+  }
+  catch(e) {
+      console.error("Check if doc exists error: ", e);
+  }
+}
+
 
 
 

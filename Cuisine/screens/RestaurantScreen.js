@@ -5,7 +5,7 @@ import { googlePlacesApiKey } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../Firebase/firebaseSetup';
-import { writeWithIdToDB, deleteWithIdFromDB } from '../Firebase/firestoreHelper'; // Import the helper functions
+import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
 
 const fetchPlaceDetails = async (place_id) => {
   try {
@@ -45,13 +45,19 @@ const RestaurantScreen = ({ route }) => {
           );
           setPhotos(photoUrls);
         }
+
+        // Check if the restaurant is already a favorite
+        const user = auth.currentUser;
+        if (user) {
+          const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, place_id);
+          setIsFavorite(exists);
+        }
       }
     };
     fetchData();
   }, [place_id]);
 
   const toggleFavorite = async () => {
-    console.log(restaurant);
     setIsFavorite(!isFavorite);
     const user = auth.currentUser;
 
