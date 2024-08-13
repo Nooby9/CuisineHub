@@ -1,11 +1,8 @@
-// components/PressableButton.js
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
 
-// PressableButton component: renders a button with a press effect and children elements
-const PressableButton = ({ children, onPress }) => {
+const PressableButton = ({ children, onPress, style }) => {
     return (
         <Pressable
             android_ripple={{ color: colors.rippleEffect }}
@@ -14,6 +11,7 @@ const PressableButton = ({ children, onPress }) => {
                     opacity: pressed ? 0.5 : 1,
                 },
                 styles.button,
+                style,
             ]}
             onPress={onPress}
         >
@@ -26,7 +24,11 @@ const PressableButton = ({ children, onPress }) => {
 
 const styles = StyleSheet.create({
     button: {
-        marginRight: 5,
+        // marginRight: 5,
+        borderRadius: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        alignItems: 'center',
     },
 });
 
