@@ -37,6 +37,8 @@ const LoginScreen = ({ navigation }) => {
                     Alert.alert('Wrong password');
                 } else if (errorCode === 'auth/invalid-email') {
                     Alert.alert('Invalid email');
+                } else if (errorCode === 'auth/invalid-credential') { // used for anti-brute-force attacks
+                    Alert.alert('Invalid Credentials');
                 }
             });
     };
