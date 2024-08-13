@@ -11,35 +11,9 @@ import { fetchPlaceDetails } from '../utils/CommonMethod';
 
 const userId = 'j3lDxeV4xis2aSngmgyU'; // Your user ID
 
-const SavedPostsScreen = ({ navigation }) => {
+const FavoriteScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]); // State to store user's posts
-  const [region, setRegion] = useState({
-    // Initial region setup for the map
-    latitude: 37.4161493,
-    longitude: -122.0812166,
-    latitudeDelta: 0.35,
-    longitudeDelta: 0.35,
-  });
-
-  useEffect(() => {
-    (async () => {
-      // Request user location permission
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Location permission not granted');
-        return;
-      }
-
-      // Get current location
-      let location = await Location.getCurrentPositionAsync({});
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.35,
-        longitudeDelta: 0.35,
-      });
-    })();
-  }, []);
+  
 
   useEffect(() => {
     const fetchSavedPosts = async () => {
@@ -92,20 +66,6 @@ const SavedPostsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} region={region}>
-        {posts.map((post) => (
-          <Marker
-            key={post.id}
-            coordinate={{
-              latitude: post.placeDetails.geometry.location.lat,
-              longitude: post.placeDetails.geometry.location.lng,
-            }}
-            title={post.placeDetails.name}
-            description={post.placeDetails ? post.placeDetails.formatted_address : post.comment}
-          />
-        ))}
-      </MapView>
-
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
@@ -156,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SavedPostsScreen;
+export default FavoriteScreen;
