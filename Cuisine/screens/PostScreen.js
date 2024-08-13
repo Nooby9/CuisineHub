@@ -117,6 +117,7 @@ const PostScreen = ({ route }) => {
         const commentData = {
             author: await getUserName(currentUserId), // Use the current user's ID or name
             text: newComment.trim(),
+            date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
         };
 
         try {
@@ -199,17 +200,21 @@ const PostScreen = ({ route }) => {
                         </Pressable>
                     </View>
 
-                    {post.comments.map((comment, index) => (
-                        <View key={index} style={styles.commentContainer}>
-                            <View style={styles.commentItem}>
-                                <Text style={styles.commentAuthor}>{comment.author}</Text>
-                                <Text>{comment.text}</Text>
+                    {post.comments
+                        .slice() // Create a shallow copy to avoid mutating the original array
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .map((comment, index) => (
+                            <View key={index} style={styles.commentContainer}>
+                                <View style={styles.commentItem}>
+                                    <Text style={styles.commentAuthor}>{comment.author}</Text>
+                                    <Text style={styles.commentDate}>{comment.date}</Text>
+                                    <Text>{comment.text}</Text>
+                                </View>
+                                {index < post.comments.length - 1 && (
+                                    <View style={styles.divider} />
+                                )}
                             </View>
-                            {index < post.comments.length - 1 && (
-                                <View style={styles.divider} />
-                            )}
-                        </View>
-                    ))}
+                        ))}
                 </View>
             </ScrollView>
             <View style={commonStyles.likeSection}>
@@ -306,6 +311,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 5,
     },
+    commentDate: {
+        fontSize: 12,
+        color: '#888',
+        marginBottom: 5,
+    },
     divider: {
         height: 1,
         backgroundColor: 'rgba(204, 204, 204, 0.3)',
@@ -332,7 +342,7 @@ const styles = StyleSheet.create({
         color: '#777',
         marginTop: 2, // Small margin between the icon and the text
     },
-    
+
     addCommentSection: {
         flexDirection: 'row',
         alignItems: 'center',
