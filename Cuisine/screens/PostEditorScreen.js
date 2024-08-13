@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, Touchabl
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { getUserName, writeToDB, deleteFromDB } from '../Firebase/firestoreHelper';
+import { getUserName, writeToDB, deleteFromDB, updateDB } from '../Firebase/firestoreHelper';
 import { storage } from '../Firebase/firebaseSetup'; // Your Firebase storage setup
 import PressableButton from '../components/PressableButton';
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the ImagePickerComponent
@@ -24,6 +24,7 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [restaurants, setRestaurants] = useState([]); // State to store search results
     const [showDropdown, setShowDropdown] = useState(false);
     const [pendingDeletions, setPendingDeletions] = useState([]); // Track pending deletions
+    const [isSubmitting, setIsSubmitting] = useState(false); // State of pressing the post button
     const [author, setAuthor] = useState('');
     const { post, mode } = route.params || {};
 
@@ -144,6 +145,9 @@ const PostEditorScreen = ({ navigation, route }) => {
 
     // Function to handle post submission
     const handleSubmit = async () => {
+        if (isSubmitting) return; // Prevent double submission
+        setIsSubmitting(true);
+
         // Check if the title is empty
         if (!title.trim()) {
             Alert.alert('Title Required', 'Please enter a title for your post.');
@@ -176,7 +180,9 @@ const PostEditorScreen = ({ navigation, route }) => {
 
         try {
             // Delete pending images from storage
-            await Promise.all(pendingDeletions.map(deleteImageFromStorage));
+            if (mode === 'edit') {
+                await Promise.all(pendingDeletions.map(deleteImageFromStorage));
+            }
 
             // Upload images and get their URLs
             const imageUrls = await Promise.all(images.map(imageUri => uploadImageToStorage(imageUri)));
@@ -193,9 +199,15 @@ const PostEditorScreen = ({ navigation, route }) => {
             };
 
 
-            // Write to Firestore
-            await writeToDB(postData, COLLECTION_NAME);
-            Alert.alert('Success', 'Post has been successfully submitted.');
+            if (mode === 'edit' && post.id) {
+                // Update the existing post in Firestore
+                await updateDB(post.id, postData, COLLECTION_NAME);
+                Alert.alert('Success', 'Post has been successfully updated.');
+            } else {
+                // Write to Firestore
+                await writeToDB(postData, COLLECTION_NAME);
+                Alert.alert('Success', 'Post has been successfully submitted.');
+            }
 
             // Navigate back to the previous screen after submission
             navigation.goBack();
@@ -208,9 +220,9 @@ const PostEditorScreen = ({ navigation, route }) => {
     // Callback function to handle image removal
     const handleImageRemove = (uri, isStoredInStorage) => {
         if (isStoredInStorage) {
-          setPendingDeletions((prev) => [...prev, uri]);
+            setPendingDeletions((prev) => [...prev, uri]);
         }
-      };    
+    };
 
     async function uploadImageToStorage(imageUri) {
         try {
@@ -299,9 +311,10 @@ const PostEditorScreen = ({ navigation, route }) => {
                 <Pressable
                     style={({ pressed }) => [
                         styles.postButton,
-                        pressed && styles.pressedStyle,
+                        (pressed || isSubmitting) && styles.pressedStyle,
                     ]}
                     onPress={handleSubmit}
+                    disabled={isSubmitting} // Disable the button when submitting
                 >
                     <Text style={styles.postButtonText}>
                         {route.name === 'New Post' ? 'Post' : 'Confirm Edit'}
@@ -383,6 +396,7 @@ const styles = StyleSheet.create({
     },
     pressedStyle: {
         opacity: 0.8,
+        backgroundColor: '#aaa', // Change color to gray when pressed or disabled
     },
     postButtonText: {
         color: '#ffffff',
