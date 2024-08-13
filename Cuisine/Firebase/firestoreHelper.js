@@ -55,7 +55,7 @@ export async function writeWithIdToDB(data, collectionName, id){
   }
 }
 
-export async function deletWithIdFromDB(collectionName, id){
+export async function deleteWithIdFromDB(collectionName, id){
   try{
       await deleteDoc(doc(database, collectionName, id));
   }

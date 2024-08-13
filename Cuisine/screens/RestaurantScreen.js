@@ -3,9 +3,9 @@ import { StyleSheet, Text, View, ScrollView, FlatList, Image, Pressable } from '
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the heart icon
-import { auth, database } from '../Firebase/firebaseSetup'; // Assuming auth is imported here to get the current user
-import { writeWithIdToDB } from '../Firebase/firestoreHelper'; // Import the helper function to write data to Firestore
+import { Ionicons } from '@expo/vector-icons';
+import { auth } from '../Firebase/firebaseSetup';
+import { writeWithIdToDB, deleteWithIdFromDB } from '../Firebase/firestoreHelper'; // Import the helper functions
 
 const fetchPlaceDetails = async (place_id) => {
   try {
@@ -13,7 +13,7 @@ const fetchPlaceDetails = async (place_id) => {
       params: {
         place_id: place_id,
         key: googlePlacesApiKey,
-        fields: 'name,rating,opening_hours,formatted_address,photos', 
+        fields: 'name,rating,opening_hours,formatted_address,photos',
       },
     });
     return response.data.result;
@@ -52,20 +52,26 @@ const RestaurantScreen = ({ route }) => {
 
   const toggleFavorite = async () => {
     setIsFavorite(!isFavorite);
-    if (restaurant) {
-      const user = auth.currentUser;
-      if (user) {
-        const favoriteData = {
-          place_id: place_id,
-          name: restaurant.name,
-          address: restaurant.formatted_address,
-          rating: restaurant.rating,
-          timestamp: new Date(),
-        };
+    const user = auth.currentUser;
+
+    if (user && restaurant) {
+      const favoriteData = {
+        place_id: place_id,
+        name: restaurant.name,
+        address: restaurant.formatted_address,
+        rating: restaurant.rating,
+        timestamp: new Date(),
+      };
+
+      if (!isFavorite) {
+        // Adding to favorites
         await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, place_id);
       } else {
-        console.error('User not logged in');
+        // Removing from favorites
+        await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, place_id);
       }
+    } else {
+      console.error('User not logged in or restaurant data unavailable');
     }
   };
 
