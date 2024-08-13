@@ -86,16 +86,16 @@ const SearchScreen = ({ navigation }) => {
 
   const renderRestaurant = ({ item }) => (
     <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
-      <Text style={styles.restaurantName}>{item.name}</Text>
-      <Text style={styles.restaurantAddress}>{item.formatted_address}</Text>
-      <Text>Rating: {item.rating} stars</Text>
-      <Text>Number of Ratings: {item.user_ratings_total}</Text>
       {item.photos && item.photos.length > 0 && (
         <Image
           source={{ uri: getPhotoUrl(item.photos[0].photo_reference) }}
           style={styles.restaurantPhoto}
         />
       )}
+      <Text style={styles.restaurantName}>{item.name}</Text>
+      <Text style={styles.restaurantAddress}>{item.formatted_address}</Text>
+      <Text>Rating: {item.rating} stars</Text>
+      <Text>Number of Ratings: {item.user_ratings_total}</Text>
     </TouchableOpacity>
   );
 
