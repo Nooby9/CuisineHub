@@ -8,7 +8,7 @@
 
 ● **Explore Nearby**: Discover the best restaurants around you with our expertly curated recommendations, complete with user reviews and ratings to guide your next meal.
 
-● **Search for Cuisine**: Easily search for specific types of cuisine, dishes, or restaurants to satisfy your cravings. 
+● **Search for Cuisine**: Easily search for specific types of cuisine, dishes, or restaurants to satisfy your cravings.
 
 ● **Capture and Share**: Snap and upload stunning photos of your meals, tag the restaurant, and write detailed reviews to share your dining experiences.
 
@@ -54,11 +54,11 @@ npx expo start --tunnel
 * **title (String):** The title of the post.
 * **imageUrls (Array):** URLs of images on Storage.
 * **place_id (String):** The Google Place ID of the restaurant.
-* **author (String):** The author of the post (defaults to "Anonymous" if not provided).
+* **author (String):** The UID of author of the post (Get realtime author name by UID from Firestore).
 * **comment (String):** The author's content of the post.
 * **likedBy (Array):** Array of userId that likes the post .
 * **date (String):** The date the post was created in YYYY-MM-DD format.
-* **comments (Array):** List of other uers' comments on the post.
+* **comments (Array):** List of other uers' comments[author(String), text(String), date(String)] on the post.
 
 ### 2. User
 
@@ -198,3 +198,34 @@ npx expo start --tunnel
 - ![Restaurant Pin](image/README/restaurant_pin.png)
 - ![Profile Page](image/README/profile_page.png)
 - ![Saved Posts](image/README/save_post.png)
+
+### 6.2 Iteration 2
+
+#### Huijia Wang
+
+1. **Post Image Storage in Firebase Storage**:
+
+- Implemented functionality to store images associated with posts in Firebase Storage and store the image URI in Firestore.
+
+2. **Post Deletion and Modification**:
+
+   - Enabled the deletion and modification of posts, including the ability to update the restaurant, title, comment content, and images.
+   - Ensured that image changes (additions or deletions) are synchronized with Firebase Storage, keeping the storage in sync with the post's data.
+
+     ![1723569899315](image/README/1723569899315.png)
+3. **Like Button Synchronization**:
+
+   - Added functionality to synchronize the like button in both `PostItem` and `PostScreen` components, reflecting the current user's like status.
+   - Implemented a system to count likes based on the number of unique user IDs (UIDs) who have liked a post, displaying the like count accurately.
+
+     ![1723569818592](image/README/1723569818592.png)
+4. **Commenting on Posts**:
+
+   - Introduced the ability for users to comment on posts.
+   - Comments are stored with the current user's UID and timestamped with the exact date and time.
+
+     ![1723569852747](image/README/1723569852747.png)
+5. **Dynamic Author Display Based on UID**:
+
+   - Modified the system to store the author of posts and comments as UIDs instead of usernames.
+   - On display, the system retrieves the latest username from Firestore based on the UID, ensuring that any changes to the username are correctly reflected across the application.
