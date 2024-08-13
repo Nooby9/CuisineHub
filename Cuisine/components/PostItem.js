@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PressableButton from './PressableButton';
-import { useNavigation,useFocusEffect  } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { colors, commonStyles } from '../style';
@@ -20,7 +20,7 @@ const PostItem = ({ item, onPress }) => {
   // State to track if the post is liked by the current user
   const [isFavorite, setIsFavorite] = useState(false);
   const [authorName, setAuthorName] = useState('Anonymous');
-  const currentUserId = auth.currentUser.uid; 
+  const currentUserId = auth.currentUser.uid;
 
   // useEffect to fetch the image URL from Firebase Storage
   useEffect(() => {
@@ -51,27 +51,23 @@ const PostItem = ({ item, onPress }) => {
     fetchAuthorName();
   }, [item]);
 
-  // useEffect to check if the user has already liked the post
-  // useEffect(() => {
-    async function fetchLikeData() {
-      try {
-        const likedBy = await fetchArrayDataByField(COLLECTION_NAME, item.id, 'likedBy');
 
-        setIsFavorite(likedBy.includes(currentUserId));
-        setLikesCount(likedBy.length);
-      } catch (error) {
-        console.error('Error checking if post is liked:', error);
-      }
+  async function fetchLikeData() {
+    try {
+      const likedBy = await fetchArrayDataByField(COLLECTION_NAME, item.id, 'likedBy');
+
+      setIsFavorite(likedBy.includes(currentUserId));
+      setLikesCount(likedBy.length);
+    } catch (error) {
+      console.error('Error checking if post is liked:', error);
     }
-
-  //   fetchLikeData();
-  // }, []);
+  }
 
   useFocusEffect(
     React.useCallback(() => {
-        fetchLikeData();
+      fetchLikeData();
     }, [item.id])
-);
+  );
 
   // Function to handle the like button press
   const handleLikePress = async () => {
@@ -91,7 +87,7 @@ const PostItem = ({ item, onPress }) => {
 
   return (
     <View style={styles.card}>
-      <Pressable onPress={()=>onPress(item)}>
+      <Pressable onPress={() => onPress(item)}>
         <Image source={{ uri: imageUrl || 'fallback_image_url' }} style={styles.cardImage} />
         <Text style={styles.cardTitle}>{item.title}</Text>
       </Pressable>

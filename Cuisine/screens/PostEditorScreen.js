@@ -170,12 +170,6 @@ const PostEditorScreen = ({ navigation, route }) => {
         }
         setIsSubmitting(true);
 
-        // // Use "Anonymous" if author is empty
-        // const authorName = await getUserName(currentUserId);
-        // if (!authorName) {
-        //     authorName = "Anonymous";
-        // }
-
         try {
             // Delete pending images from storage
             if (mode === 'edit') {
