@@ -7,20 +7,15 @@ import { doc, setDoc } from 'firebase/firestore';
 import PressableButton from '../components/PressableButton';
 import { colors } from '../style';
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
+import { writeWithIdToDB } from '../Firebase/firestoreHelper';
 
-export async function writeWithIdToDB(data, collectionName, id){
-  try {
-    await setDoc(doc(database, collectionName, id), data, { merge: true });
-  } catch (e) {
-    console.error("Writing to database with id error: ", e);
-  }
-}
 
 const SignupScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
 
     const loginHandler = () => {
         navigation.replace('Login');
@@ -43,6 +38,30 @@ const SignupScreen = ({ navigation }) => {
             Alert.alert('Confirm Password cannot be empty');
             return;
         }
+        if (password.length < 8) {
+            Alert.alert('Password must be at least 6 characters long');
+            return;
+        }
+        // Check if password has at least one uppercase letter
+        if (!/[A-Z]/.test(password)) {
+            Alert.alert('Password must contain at least one uppercase letter');
+            return;
+        }
+        // Check if password has at least one lowercase letter
+        if (!/[a-z]/.test(password)) {
+            Alert.alert('Password must contain at least one lowercase letter');
+            return;
+        }
+        // Check if password has at least one number
+        if (!/[0-9]/.test(password)) {
+            Alert.alert('Password must contain at least one number');
+            return;
+        }
+        // Check if password has at least one special character
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password)) {
+            Alert.alert('Password must contain at least one special character');
+            return;
+        }
         if (password !== confirmPassword) {
             Alert.alert('Passwords do not match');
             return;
@@ -61,7 +80,7 @@ const SignupScreen = ({ navigation }) => {
                 const errorMessage = error.message;
                 console.log('Error: ', errorMessage);
                 if (errorCode === 'auth/email-already-in-use') {
-                    Alert.alert('That email is already in use!');
+                    Alert.alert('That email is already in use! Please Login');
                 } else if (errorCode === 'auth/weak-password') {
                     Alert.alert('The password is too weak');
                 } else if (errorCode === 'auth/invalid-email') {
@@ -99,9 +118,15 @@ const SignupScreen = ({ navigation }) => {
                 placeholder='Confirm Password'
                 secureTextEntry={true}
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    setPasswordsMatch(password === text);
+                }}
                 style={styles.input}
             />
+            {!passwordsMatch && (
+                <Text style={styles.errorText}>Passwords do not match</Text>
+            )}
             <PressableButton onPress={signupHandler} style={styles.registerButton}>
                 <Text style={styles.registerButtonText}>Register</Text>
             </PressableButton>
@@ -151,6 +176,10 @@ const styles = StyleSheet.create({
     loginButtonText: {
         fontSize: 16,
         color: 'black',
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 10,
     },
 });
 
