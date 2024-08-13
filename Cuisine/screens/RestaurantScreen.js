@@ -68,6 +68,7 @@ const RestaurantScreen = ({ route }) => {
         address: restaurant.formatted_address,
         rating: restaurant.rating,
         timestamp: new Date(),
+        photo_reference: restaurant.photos[0].photo_reference,
       };
 
       if (!isFavorite) {

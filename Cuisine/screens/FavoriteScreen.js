@@ -1,119 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Alert, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { onSnapshot, doc, getDoc } from 'firebase/firestore';
-import * as Location from 'expo-location';
-import { getSavedPosts } from '../Firebase/firestoreHelper';
-import { database } from '../Firebase/firebaseSetup';
-import PostItem from '../components/PostItem';
-import { fetchPlaceDetails } from '../utils/CommonMethod';
-
-const userId = 'j3lDxeV4xis2aSngmgyU'; // Your user ID
+import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
+import { auth } from '../Firebase/firebaseSetup';
+import { googlePlacesApiKey } from '@env';
 
 const FavoriteScreen = ({ navigation }) => {
-  const [posts, setPosts] = useState([]); // State to store user's posts
-  
+  const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
 
   useEffect(() => {
-    const fetchSavedPosts = async () => {
-      const savedPostIds = await getSavedPosts(userId);
-      console.log('Saved post IDs:', savedPostIds);
-      let postsArray = [];
-
-      const promises = savedPostIds.map(async (postId) => {
-        const postDoc = await getDoc(doc(database, 'Post', postId));
-        const postData = postDoc.data();
-
-        let placeDetails = {};
-        if (postData.place_id) {
-          placeDetails = await fetchPlaceDetails(postData.place_id);
-        }
-
-        return {
-          id: postId,
-          ...postData,
-          placeDetails,
-        };
-      });
-
-      postsArray = await Promise.all(promises);
-      setPosts(postsArray);
+    const fetchFavorites = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const favorites = await getFavoriteRestaurants(user.uid);
+        setFavoriteRestaurants(favorites);
+      }
     };
 
-    fetchSavedPosts();
+    fetchFavorites();
   }, []);
 
-
-    // to-do remove saved post
-  const handleDelete = (postId) => {
-    Alert.alert('Delete Post', 'Are you sure you want to delete this post?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', onPress: () => deletePost(postId) },
-    ]);
+  const getPhotoUrl = (photoReference) => {
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googlePlacesApiKey}`;
   };
 
-  const deletePost = async (postId) => {
-    try {
-      await deletePostFromFirestore(postId); 
-      setPosts(posts.filter((post) => post.id !== postId));
-      Alert.alert('Post deleted successfully');
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      Alert.alert('Error', 'Failed to delete post');
-    }
+  const handleRestaurantPress = (restaurant) => {
+    navigation.navigate('Restaurant', { place_id: restaurant.place_id });
   };
+
+  const renderRestaurant = ({ item }) => (
+    <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
+      {console.log(item)}
+      {item.photo_reference && (
+        <Image
+          source={{ uri: getPhotoUrl(item.photo_reference) }}
+          style={styles.restaurantPhoto}
+        />
+      )}
+      <Text style={styles.restaurantName}>{item.name}</Text>
+      <Text style={styles.restaurantAddress}>{item.address}</Text>
+      <Text>Rating: {item.rating} stars</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        renderItem={({ item }) => <PostItem item={item} />}
-        contentContainerStyle={styles.postList}
-      />
+      {favoriteRestaurants.length === 0 ? (
+        <Text style={styles.emptyText}>No favorite restaurants found.</Text>
+      ) : (
+        <FlatList
+          data={favoriteRestaurants}
+          keyExtractor={(item) => item.place_id}
+          renderItem={renderRestaurant}
+        />
+      )}
     </View>
   );
 };
 
+export default FavoriteScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height / 3.5,
-  },
-  postList: {
     padding: 10,
   },
-  postCard: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
+  restaurantContainer: {
     padding: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
-  postTitle: {
-    fontSize: 16,
+  restaurantName: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
   },
-  postActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  restaurantAddress: {
+    fontSize: 14,
+    color: '#666',
   },
-  editButton: {
-    color: '#007BFF',
+  restaurantPhoto: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+    borderRadius: 4,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#666',
   },
 });
-
-export default FavoriteScreen;

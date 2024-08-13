@@ -75,6 +75,18 @@ export async function checkIfDocExists(collectionName, id){
   }
 }
 
+export async function getFavoriteRestaurants(userId){
+  try{
+      const favoriteRestaurantsCollection = collection(database, `User/${userId}/FavoriteRestaurant`);
+      const favoriteRestaurantsSnapshot = await getDocs(favoriteRestaurantsCollection);
+      const favoriteRestaurants = favoriteRestaurantsSnapshot.docs.map(doc => doc.data());
+      return favoriteRestaurants;
+  }
+  catch(e) {
+      console.error("Get favorite restaurants error: ", e);
+  }
+}
+
 
 
 
