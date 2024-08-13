@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { query, where, collection, onSnapshot } from 'firebase/firestore';
 import * as Location from 'expo-location';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
-import { database } from '../Firebase/firebaseSetup';
+import { database,auth } from '../Firebase/firebaseSetup';
 import PostItem from '../components/PostItem';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
 import { useNavigation  } from '@react-navigation/native';
@@ -21,6 +21,7 @@ const FoodJournalScreen = ({ navigation }) => {
         latitudeDelta: 0.35,
         longitudeDelta: 0.35,
     });
+    const currentUserId = auth.currentUser.uid;
 
     // Define collection name
     const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
@@ -55,9 +56,12 @@ const FoodJournalScreen = ({ navigation }) => {
 
     // Fetch user's posts and get user location on component mount
     useEffect(() => {
-        const unsubscribe = onSnapshot(
+        const userPostsQuery = query(
             collection(database, COLLECTION_NAME),
-            async (querySnapshot) => {
+            where('author', '==', currentUserId)
+        );
+    
+        const unsubscribe = onSnapshot(userPostsQuery,async (querySnapshot) => {
                 let postsArray = [];
 
                 if (!querySnapshot.empty) {
