@@ -55,6 +55,15 @@ export async function writeWithIdToDB(data, collectionName, id){
   }
 }
 
+export async function deletWithIdFromDB(collectionName, id){
+  try{
+      await deleteDoc(doc(database, collectionName, id));
+  }
+  catch(e) {
+      console.error("Delete from database with id error: ", e);
+  }
+}
+
 
 
 
