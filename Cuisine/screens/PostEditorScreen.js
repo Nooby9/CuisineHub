@@ -47,7 +47,7 @@ const PostEditorScreen = ({ navigation, route }) => {
                     navigation.setOptions({
                         headerRight: () => (
                             <Pressable onPress={handleDelete}>
-                                <Ionicons name="trash-outline" size={24} color="white" style={{ marginRight: 15 }} />
+                                <Ionicons name="trash-outline" size={25} color="darkorange" style={{ marginRight: 15 }} />
                             </Pressable>
                         ),
                     });
