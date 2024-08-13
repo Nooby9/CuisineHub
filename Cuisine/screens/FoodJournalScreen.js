@@ -8,7 +8,7 @@ import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import { database } from '../Firebase/firebaseSetup';
 import PostItem from '../components/PostItem';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
-
+import { useNavigation  } from '@react-navigation/native';
 
 
 const FoodJournalScreen = ({ navigation }) => {
@@ -21,6 +21,7 @@ const FoodJournalScreen = ({ navigation }) => {
         latitudeDelta: 0.35,
         longitudeDelta: 0.35,
     });
+
     // Define collection name
     const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
@@ -109,6 +110,14 @@ const FoodJournalScreen = ({ navigation }) => {
         }
     };
 
+    // Function to handle navigation to the PostEditorScreen in edit mode
+    const handleEditPress = (post) => {
+        navigation.navigate('Edit Post', {
+            post, // Pass the post data to the editor
+            mode: 'edit', // Indicate that we're in edit mode
+        });
+    };
+
     return (
         <View style={styles.container}>
             {/* Map View */}
@@ -147,7 +156,7 @@ const FoodJournalScreen = ({ navigation }) => {
                 data={posts}
                 keyExtractor={(item) => item.id}
                 numColumns={2}
-                renderItem={({ item }) => <PostItem item={item} />}
+                renderItem={({ item }) => <PostItem item={item} onPress={handleEditPress} />}
                 contentContainerStyle={styles.postList}
 
             />
