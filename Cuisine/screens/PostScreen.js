@@ -26,9 +26,11 @@ const PostScreen = ({ route }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
     const [newComment, setNewComment] = useState(''); // State for new comment text
+    const [commentsWithUsernames, setCommentsWithUsernames] = useState([]); // State to store comments with usernames
+
 
     const navigation = useNavigation();
-    const currentUserId = auth.currentUser.uid; 
+    const currentUserId = auth.currentUser.uid;
 
     // useEffect to check if the user has already liked the post
     useEffect(() => {
@@ -87,6 +89,22 @@ const PostScreen = ({ route }) => {
         fetchImages();
     }, [post.imageUrls]);
 
+    // Fetch usernames for comments and update the state
+    useEffect(() => {
+        const fetchUsernamesForComments = async () => {
+            const commentsWithNames = await Promise.all(post.comments.map(async (comment) => {
+                const username = await getUserName(comment.author);
+                return {
+                    ...comment,
+                    authorName: username || 'Anonymous',
+                };
+            }));
+            setCommentsWithUsernames(commentsWithNames);
+        };
+        fetchUsernamesForComments();
+    }, [post.comments]);
+
+
     const handlePress = () => {
         setIsRestaurantFavorite(!isRestaurantFavorite);
     };
@@ -111,11 +129,21 @@ const PostScreen = ({ route }) => {
             Alert.alert('Comment Required', 'Please enter a comment before submitting.');
             return;
         }
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        };
 
         const commentData = {
-            author: await getUserName(currentUserId), // Use the current user's ID or name
+            author: currentUserId, // Use the current user's ID or name
             text: newComment.trim(),
-            date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+            date: formatDate(new Date()), // Current date in YYYY-MM-DD format
         };
 
         try {
@@ -128,13 +156,24 @@ const PostScreen = ({ route }) => {
             post.comments.push(commentData);
             setNewComment(''); // Clear the comment input
 
+            const updatedCommentsWithNames = await fetchUsernamesForComments(post.comments);
+            setCommentsWithUsernames(updatedCommentsWithNames);
             Alert.alert('Success', 'Comment has been successfully added.');
         } catch (error) {
             console.error('Error adding comment: ', error);
             Alert.alert('Error', 'There was an error adding your comment.');
         }
     };
-
+    // Helper function to fetch usernames for comments
+    const fetchUsernamesForComments = async (comments) => {
+        return await Promise.all(comments.map(async (comment) => {
+            const username = await getUserName(comment.author);
+            return {
+                ...comment,
+                authorName: username || 'Anonymous',
+            };
+        }));
+    };
 
     return (
         <View style={styles.container}>
@@ -198,13 +237,13 @@ const PostScreen = ({ route }) => {
                         </Pressable>
                     </View>
 
-                    {post.comments
+                    {commentsWithUsernames
                         .slice() // Create a shallow copy to avoid mutating the original array
-                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort comments by date (newest first)
                         .map((comment, index) => (
                             <View key={index} style={styles.commentContainer}>
                                 <View style={styles.commentItem}>
-                                    <Text style={styles.commentAuthor}>{comment.author}</Text>
+                                    <Text style={styles.commentAuthor}>{comment.authorName}</Text>
                                     <Text style={styles.commentDate}>{comment.date}</Text>
                                     <Text>{comment.text}</Text>
                                 </View>
