@@ -56,7 +56,7 @@ npx expo start --tunnel
 * **place_id (String):** The Google Place ID of the restaurant.
 * **author (String):** The author of the post (defaults to "Anonymous" if not provided).
 * **comment (String):** The author's content of the post.
-* **likes (Number):** Number of likes on the post.
+* **likedBy (Array):** Array of userId that likes the post .
 * **date (String):** The date the post was created in YYYY-MM-DD format.
 * **comments (Array):** List of other uers' comments on the post.
 
