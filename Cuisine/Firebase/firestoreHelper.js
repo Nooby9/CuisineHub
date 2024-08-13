@@ -103,9 +103,9 @@ export async function getUserName(userId) {
           if (userData.username) {
               return userData.username;
           } 
-      } else {
-          console.error('No such user!');
-          return null;
+      } 
+      else {
+          return "Anonymous";
       }
   } catch (e) {
       console.error('Error getting user name: ', e);
