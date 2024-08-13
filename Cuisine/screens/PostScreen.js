@@ -7,7 +7,7 @@ import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import { getUserName, updateDB } from '../Firebase/firestoreHelper';
 import { ref, getDownloadURL } from 'firebase/storage';
-import { storage } from '../Firebase/firebaseSetup';
+import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -28,9 +28,7 @@ const PostScreen = ({ route }) => {
     const [newComment, setNewComment] = useState(''); // State for new comment text
 
     const navigation = useNavigation();
-    //TODO: use this after supporting authentication
-    // const currentUserId = auth.currentUser.uid; 
-    const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
+    const currentUserId = auth.currentUser.uid; 
 
     // useEffect to check if the user has already liked the post
     useEffect(() => {

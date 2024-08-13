@@ -8,6 +8,7 @@ import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase st
 import { colors, commonStyles } from '../style';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
+import { getUserName } from '../Firebase/firestoreHelper';
 
 // Define collection name
 const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
@@ -18,9 +19,8 @@ const PostItem = ({ item, onPress }) => {
   const [imageUrl, setImageUrl] = useState(null);
   // State to track if the post is liked by the current user
   const [isFavorite, setIsFavorite] = useState(false);
-  //TODO: use this after supporting authentication
-  // const currentUserId = auth.currentUser.uid; 
-  const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
+  const [authorName, setAuthorName] = useState('Anonymous');
+  const currentUserId = auth.currentUser.uid; 
 
   // useEffect to fetch the image URL from Firebase Storage
   useEffect(() => {
@@ -35,11 +35,21 @@ const PostItem = ({ item, onPress }) => {
       }
     }
 
+    const fetchAuthorName = async () => {
+      try {
+        const name = await getUserName(item.author);
+        setAuthorName(name || 'Anonymous');
+      } catch (error) {
+        console.error('Error fetching author name:', error);
+      }
+    };
+
     // Check if there is an image URL to fetch
     if (item.imageUrls && item.imageUrls[0]) {
       fetchImageUrl();
     }
-  }, [item.imageUrls]);
+    fetchAuthorName();
+  }, [item]);
 
   // useEffect to check if the user has already liked the post
   // useEffect(() => {
@@ -86,7 +96,7 @@ const PostItem = ({ item, onPress }) => {
         <Text style={styles.cardTitle}>{item.title}</Text>
       </Pressable>
       <View style={styles.cardFooter}>
-        <Text style={styles.cardAuthor}>{item.author}</Text>
+        <Text style={styles.cardAuthor}>{authorName}</Text>
 
         <View style={commonStyles.likeSection}>
           <PressableButton onPress={handleLikePress}>

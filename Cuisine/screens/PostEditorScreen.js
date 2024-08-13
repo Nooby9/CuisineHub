@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getUserName, writeToDB, deleteFromDB, updateDB } from '../Firebase/firestoreHelper';
-import { storage } from '../Firebase/firebaseSetup'; // Your Firebase storage setup
+import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import PressableButton from '../components/PressableButton';
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the ImagePickerComponent
 import { googlePlacesApiKey } from '@env'; // Import your Google Places API key
@@ -28,9 +28,7 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [author, setAuthor] = useState('');
     const { post, mode } = route.params || {};
 
-    //TODO: use this after supporting authentication
-    // const currentUserId = auth.currentUser.uid; 
-    const currentUserId = "h3omrHZiE8fkrdl5jTPhTFNaWIP2";
+    const currentUserId = auth.currentUser.uid;
 
 
     // Pre-fill the fields if we're in edit mode
@@ -172,11 +170,11 @@ const PostEditorScreen = ({ navigation, route }) => {
         }
         setIsSubmitting(true);
 
-        // Use "Anonymous" if author is empty
-        const authorName = await getUserName(currentUserId);
-        if (!authorName) {
-            authorName = "Anonymous";
-        }
+        // // Use "Anonymous" if author is empty
+        // const authorName = await getUserName(currentUserId);
+        // if (!authorName) {
+        //     authorName = "Anonymous";
+        // }
 
         try {
             // Delete pending images from storage
@@ -195,19 +193,19 @@ const PostEditorScreen = ({ navigation, route }) => {
                     title,
                     imageUrls: imageUrls,
                     place_id: placeId,
-                    author: authorName,
+                    author: post.author,
                     comment: content,
                     likedBy: post.likedBy, // Retain existing likedBy
                     date: post.date, // Retain existing date
                     comments: post.comments, // Retain existing comments
                 };
             } else {
-                // Prepare the post data
-                const postData = {
+                 // Create a new post with default likedBy, date, and comments
+                postData = {
                     title,
                     imageUrls: imageUrls,
                     place_id: placeId,
-                    author: authorName,
+                    author: currentUserId,
                     comment: content,
                     likedBy: [],
                     date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
