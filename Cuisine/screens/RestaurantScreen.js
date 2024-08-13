@@ -51,6 +51,7 @@ const RestaurantScreen = ({ route }) => {
   }, [place_id]);
 
   const toggleFavorite = async () => {
+    console.log(restaurant);
     setIsFavorite(!isFavorite);
     const user = auth.currentUser;
 
@@ -78,12 +79,21 @@ const RestaurantScreen = ({ route }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Pressable onPress={toggleFavorite} style={styles.favoriteButton}>
-          <Ionicons name={isFavorite ? 'heart' : 'heart-outline'} size={24} color={isFavorite ? 'red' : 'black'} />
+        <Pressable 
+          onPress={toggleFavorite} 
+          style={styles.favoriteButton}
+          disabled={!restaurant} // Disable button if restaurant data is not yet available
+        >
+          <Ionicons 
+            name={isFavorite ? 'heart' : 'heart-outline'} 
+            size={24} 
+            color={isFavorite ? 'red' : 'black'} 
+          />
         </Pressable>
       ),
     });
-  }, [navigation, isFavorite]);
+  }, [navigation, isFavorite, restaurant]);
+  
 
   const renderImage = ({ item }) => (
     <Image source={{ uri: item }} style={styles.postImage} />
@@ -114,9 +124,6 @@ const RestaurantScreen = ({ route }) => {
         <View style={styles.locationLeft}>
           <Text style={styles.locationTitle}>Location: </Text>
           <Text style={styles.location}>{restaurant.formatted_address || 'No address available'}</Text>
-        </View>
-        <View style={styles.locationRight}>
-          <Text>{">"}</Text>
         </View>
       </View>
     </ScrollView>
