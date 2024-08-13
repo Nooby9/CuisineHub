@@ -6,6 +6,7 @@ import { database } from '../Firebase/firebaseSetup';
 import { doc, setDoc } from 'firebase/firestore';
 import PressableButton from '../components/PressableButton';
 import { colors } from '../style';
+import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
 
 export async function writeWithIdToDB(data, collectionName, id){
   try {
@@ -93,6 +94,7 @@ const SignupScreen = ({ navigation }) => {
                 onChangeText={setPassword}
                 style={styles.input}
             />
+            <PasswordStrengthMeterBar password={password} />
             <TextInput
                 placeholder='Confirm Password'
                 secureTextEntry={true}
