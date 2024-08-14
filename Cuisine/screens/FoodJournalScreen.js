@@ -137,12 +137,14 @@ const FoodJournalScreen = ({ navigation }) => {
                     region={region}
                 >
                     {currentLocation && (
-                        <Marker
-                            coordinate={currentLocation}
-                            title="Your Location"
-                            pinColor="blue"
-                        />
+                        <Marker coordinate={currentLocation} pinColor="blue">
+                            <View style={styles.markerContainer}>
+                                <Text style={styles.markerText}>Your Location</Text>
+                                <Ionicons name="location-sharp" size={24} color="blue" />
+                            </View>
+                        </Marker>
                     )}
+
                     {posts.map((post) => (
                         <Marker
                             key={post.place_id}
@@ -194,6 +196,15 @@ const styles = StyleSheet.create({
     },
     map: {
         ...StyleSheet.absoluteFillObject, // Makes the map fill the entire container
+    },
+    markerContainer: {
+        alignItems: 'center',
+    },
+    markerText: {
+        color: 'blue',
+        fontSize: 8,
+        marginBottom: 2,
+        fontWeight: 'bold',
     },
     loadingOverlay: {
         position: 'absolute',
