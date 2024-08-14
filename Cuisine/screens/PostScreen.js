@@ -8,6 +8,11 @@ import { colors, commonStyles } from '../style';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
+import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
+import { Ionicons } from '@expo/vector-icons';
+import { auth } from '../Firebase/firebaseSetup';
+
+
 
 const PostScreen = ({ route }) => {
     const { post } = route.params;
@@ -17,17 +22,26 @@ const PostScreen = ({ route }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (post.place_id) {
-                const placeDetails = await fetchPlaceDetails(post.place_id);
-                setRestaurant(placeDetails);
+            try {
+                if (post.place_id) {
+                    const placeDetails = await fetchPlaceDetails(post.place_id);
+                    setRestaurant(placeDetails);
+                    if (placeDetails) {
+                        // Check if the restaurant is already a favorite
+                        const user = auth.currentUser;
+                        if (user) {
+                            const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                            setIsFavorite(exists);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching place details:', error);
             }
         };
         fetchData();
     }, [post.place_id]);
 
-    const handlePress = () => {
-        setIsFavorite(!isFavorite);
-    };
 
     const renderImage = ({ item }) => (
         <Image source={{ uri: item }} style={styles.postImage} />
@@ -42,6 +56,36 @@ const PostScreen = ({ route }) => {
     if (!restaurant) {
         return <Text>Loading restaurant information...</Text>;
     }
+
+    const toggleFavorite = async () => {
+        try {
+            setIsFavorite(!isFavorite);
+            const user = auth.currentUser;
+        
+            if (user && restaurant) {
+            const favoriteData = {
+                place_id: post.place_id,
+                name: restaurant.name,
+                address: restaurant.formatted_address,
+                rating: restaurant.rating,
+                timestamp: new Date(),
+                photo_reference: restaurant.photos[0].photo_reference,
+            };
+        
+            if (!isFavorite) {
+                // Adding to favorites
+                await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, place_id);
+            } else {
+                // Removing from favorites
+                await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, place_id);
+            }
+            } else {
+            console.error('User not logged in or restaurant data unavailable');
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+      };
 
     return (
         <ScrollView style={styles.container}>
@@ -68,12 +112,12 @@ const PostScreen = ({ route }) => {
                     </View>
 
                     <View style={commonStyles.likeSection}>
-                        <PressableButton onPress={handlePress} >
-                            <MaterialIcons
-                                name={isFavorite ? 'favorite' : 'favorite-border'}
-                                size={22}
-                                color={isFavorite ? colors.favorite : colors.notFavorite}
-                            />
+                        <PressableButton onPress={toggleFavorite} >
+                        <Ionicons 
+                            name={isFavorite ? 'heart' : 'heart-outline'} 
+                            size={24} 
+                            color={isFavorite ? 'red' : 'black'} 
+                        />
                         </PressableButton>
                     </View>
                 </Pressable>
