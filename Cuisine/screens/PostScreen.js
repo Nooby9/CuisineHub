@@ -9,6 +9,8 @@ import { getUserName, updateDB } from '../Firebase/firestoreHelper';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
+import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
+import { Ionicons } from '@expo/vector-icons';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
@@ -39,7 +41,6 @@ const PostScreen = ({ route }) => {
                 const likedBy = await fetchArrayDataByField(COLLECTION_NAME, post.id, 'likedBy');
 
                 setIsFavorite(likedBy.includes(currentUserId));
-                console.log(likedBy.length)
                 setLikesCount(likedBy.length);
             } catch (error) {
                 console.error('Error checking if post is liked:', error);
@@ -67,9 +68,21 @@ const PostScreen = ({ route }) => {
     // useEffect to fetch restaurant details based on place_id from the post data
     useEffect(() => {
         const fetchData = async () => {
-            if (post.place_id) {
-                const placeDetails = await fetchPlaceDetails(post.place_id);
-                setRestaurant(placeDetails);
+            try {
+                if (post.place_id) {
+                    const placeDetails = await fetchPlaceDetails(post.place_id);
+                    setRestaurant(placeDetails);
+                    if (placeDetails) {
+                        // Check if the restaurant is already a favorite
+                        const user = auth.currentUser;
+                        if (user) {
+                            const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                            setIsRestaurantFavorite(exists);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching place details:', error);
             }
         };
         fetchData();
@@ -105,9 +118,6 @@ const PostScreen = ({ route }) => {
     }, [post.comments]);
 
 
-    const handlePress = () => {
-        setIsRestaurantFavorite(!isRestaurantFavorite);
-    };
 
     // Function to render each image in the FlatList
     const renderImage = ({ item }) => (
@@ -175,6 +185,41 @@ const PostScreen = ({ route }) => {
         }));
     };
 
+    
+    const toggleRestaurantFavorite = async () => {
+        try {
+            console.log('IsRestaurantFavorite:', isRestaurantFavorite); 
+            setIsRestaurantFavorite(!isRestaurantFavorite);
+            const user = auth.currentUser;
+        
+            if (user && restaurant) {
+                console.log(post.place_id);
+                const favoriteData = {
+                    place_id: post.place_id,
+                    name: restaurant.name,
+                    address: restaurant.formatted_address,
+                    rating: restaurant.rating,
+                    timestamp: new Date(),
+                    photo_reference: restaurant.photos[0].photo_reference,
+                };
+        
+            if (!isRestaurantFavorite) {
+                // Adding to favorites
+                await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                console.log("Added to favorites");
+            } else {
+                // Removing from favorites
+                await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                console.log("Removed from favorites");
+            }
+            } else {
+            console.error('User not logged in or restaurant data unavailable');
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+      };
+
     return (
         <View style={styles.container}>
             <ScrollView style={styles.container}>
@@ -200,16 +245,16 @@ const PostScreen = ({ route }) => {
 
                         </View>
 
-                        <View style={commonStyles.likeSection}>
-                            <PressableButton onPress={handlePress} >
-                                <MaterialIcons
-                                    name={isRestaurantFavorite ? 'favorite' : 'favorite-border'}
-                                    size={22}
-                                    color={isRestaurantFavorite ? colors.favorite : colors.notFavorite}
-                                />
-                            </PressableButton>
-                        </View>
-                    </Pressable>
+                    <View style={commonStyles.likeSection}>
+                        <PressableButton onPress={toggleRestaurantFavorite} >
+                        <Ionicons 
+                            name={isRestaurantFavorite ? 'heart' : 'heart-outline'} 
+                            size={24} 
+                            color={isRestaurantFavorite ? 'red' : 'black'} 
+                        />
+                        </PressableButton>
+                    </View>
+                </Pressable>
 
                     <Text style={styles.restaurantRating}>{restaurant.rating} stars</Text>
                     <Text style={styles.restaurantAddress}>{restaurant.formatted_address}</Text>

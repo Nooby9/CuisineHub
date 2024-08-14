@@ -42,8 +42,8 @@ const ProfileScreen = () => {
     navigation.navigate('Personal Food Journal');
   };
 
-  const handleSavedPosts = () => {
-    navigation.navigate('Saved Posts');
+  const handleFavorites = () => {
+    navigation.navigate('Favorites');
   };
 
   const handleNotifications = () => {
@@ -84,8 +84,8 @@ const ProfileScreen = () => {
         <Text style={styles.actionText}>Personal Food Journal</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButton} onPress={handleSavedPosts}>
-        <Text style={styles.actionText}>Saved Posts</Text>
+      <TouchableOpacity style={styles.actionButton} onPress={handleFavorites}>
+        <Text style={styles.actionText}>Favorites</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.actionButton} onPress={handleNotifications}>

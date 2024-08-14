@@ -137,6 +137,38 @@ export async function writeWithIdToDB(data, collectionName, id){
   }
 }
 
+export async function deleteWithIdFromDB(collectionName, id){
+  try{
+      await deleteDoc(doc(database, collectionName, id));
+  }
+  catch(e) {
+      console.error("Delete from database with id error: ", e);
+  }
+}
+
+export async function checkIfDocExists(collectionName, id){
+  try{
+      const docRef = doc(database, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      return docSnap.exists();
+  }
+  catch(e) {
+      console.error("Check if doc exists error: ", e);
+  }
+}
+
+export async function getFavoriteRestaurants(userId){
+  try{
+      const favoriteRestaurantsCollection = collection(database, `User/${userId}/FavoriteRestaurant`);
+      const favoriteRestaurantsSnapshot = await getDocs(favoriteRestaurantsCollection);
+      const favoriteRestaurants = favoriteRestaurantsSnapshot.docs.map(doc => doc.data());
+      return favoriteRestaurants;
+  }
+  catch(e) {
+      console.error("Get favorite restaurants error: ", e);
+  }
+}
+
 
 
 
