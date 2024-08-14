@@ -5,10 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { query, where, collection, onSnapshot } from 'firebase/firestore';
 import * as Location from 'expo-location';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
-import { database,auth } from '../Firebase/firebaseSetup';
+import { database, auth } from '../Firebase/firebaseSetup';
 import PostItem from '../components/PostItem';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
-import { useNavigation  } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 
 const FoodJournalScreen = ({ navigation }) => {
@@ -18,9 +18,10 @@ const FoodJournalScreen = ({ navigation }) => {
         // Initial region setup for the map
         latitude: 37.4161493,
         longitude: -122.0812166,
-        latitudeDelta: 0.35,
-        longitudeDelta: 0.35,
+        latitudeDelta: 0.15,
+        longitudeDelta: 0.15,
     });
+    const [currentLocation, setCurrentLocation] = useState(null); // State to store current location
     const currentUserId = auth.currentUser.uid;
 
     // Define collection name
@@ -43,8 +44,13 @@ const FoodJournalScreen = ({ navigation }) => {
                 setRegion({
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
-                    latitudeDelta: 0.35,
-                    longitudeDelta: 0.35,
+                    latitudeDelta: 0.15,
+                    longitudeDelta: 0.15,
+                });
+                // Store current location for marker
+                setCurrentLocation({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
                 });
             } catch (error) {
                 console.error('Error fetching location:', error);
@@ -60,33 +66,33 @@ const FoodJournalScreen = ({ navigation }) => {
             collection(database, COLLECTION_NAME),
             where('author', '==', currentUserId)
         );
-    
-        const unsubscribe = onSnapshot(userPostsQuery,async (querySnapshot) => {
-                let postsArray = [];
 
-                if (!querySnapshot.empty) {
-                    const promises = querySnapshot.docs.map(async (doc) => {
-                        const postData = doc.data();
+        const unsubscribe = onSnapshot(userPostsQuery, async (querySnapshot) => {
+            let postsArray = [];
 
-                        // Fetch additional place details
-                        let placeDetails = {};
-                        if (postData.place_id) {
-                            placeDetails = await fetchPlaceDetails(postData.place_id);
-                        }
+            if (!querySnapshot.empty) {
+                const promises = querySnapshot.docs.map(async (doc) => {
+                    const postData = doc.data();
 
-                        return {
-                            id: doc.id,
-                            ...postData,
-                            placeDetails,
-                        };
-                    });
+                    // Fetch additional place details
+                    let placeDetails = {};
+                    if (postData.place_id) {
+                        placeDetails = await fetchPlaceDetails(postData.place_id);
+                    }
+
+                    return {
+                        id: doc.id,
+                        ...postData,
+                        placeDetails,
+                    };
+                });
 
 
-                    postsArray = await Promise.all(promises);
-                }
-
-                setPosts(postsArray);
+                postsArray = await Promise.all(promises);
             }
+
+            setPosts(postsArray);
+        }
         );
         return () => unsubscribe(); // Cleanup subscription on unmount
 
@@ -130,6 +136,13 @@ const FoodJournalScreen = ({ navigation }) => {
                     style={styles.map}
                     region={region}
                 >
+                    {currentLocation && (
+                        <Marker
+                            coordinate={currentLocation}
+                            title="Your Location"
+                            pinColor="blue"
+                        />
+                    )}
                     {posts.map((post) => (
                         <Marker
                             key={post.place_id}
@@ -221,7 +234,7 @@ const styles = StyleSheet.create({
         bottom: 5, // Aligns the delete button to the bottom of the post
         right: 5, // Aligns the delete button to the right of the post
     },
-    
+
 });
 
 export default FoodJournalScreen;
