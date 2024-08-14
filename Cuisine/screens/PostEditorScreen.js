@@ -176,16 +176,25 @@ const PostEditorScreen = ({ navigation, route }) => {
                 await Promise.all(pendingDeletions.map(deleteImageFromStorage));
             }
 
-            // Upload images and get their URLs
-            const imageUrls = await Promise.all(images.map(imageUri => uploadImageToStorage(imageUri)));
+            // Separate existing images (those already in post.imageUrls) and new images (local URIs)
+            const newImages = images.filter(imageUri => !imageUri.startsWith("https://"));
 
+            // Upload only new images and get their URIs
+            const uploadedImageUris = await Promise.all(newImages.map(imageUri => uploadImageToStorage(imageUri)));
+
+
+            
             let postData;
 
             if (mode === 'edit' && post.id) {
+                // Combine existing image URIs with newly uploaded ones
+                const finalImageUris = [...post.imageUrls, ...uploadedImageUris];
+                console.log("finalImageUris:", finalImageUris)
+
                 // Retain the existing likedBy, date, and comments when editing
                 postData = {
                     title,
-                    imageUrls: imageUrls,
+                    imageUrls: finalImageUris,
                     place_id: placeId,
                     author: post.author,
                     comment: content,
@@ -194,10 +203,10 @@ const PostEditorScreen = ({ navigation, route }) => {
                     comments: post.comments, // Retain existing comments
                 };
             } else {
-                 // Create a new post with default likedBy, date, and comments
+                // Create a new post with default likedBy, date, and comments
                 postData = {
                     title,
-                    imageUrls: imageUrls,
+                    imageUrls: uploadedImageUris,
                     place_id: placeId,
                     author: currentUserId,
                     comment: content,
