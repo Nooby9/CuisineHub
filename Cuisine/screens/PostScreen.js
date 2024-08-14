@@ -11,9 +11,6 @@ import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase st
 import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
 import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
 import { Ionicons } from '@expo/vector-icons';
-import { auth } from '../Firebase/firebaseSetup';
-
-
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
@@ -44,7 +41,6 @@ const PostScreen = ({ route }) => {
                 const likedBy = await fetchArrayDataByField(COLLECTION_NAME, post.id, 'likedBy');
 
                 setIsFavorite(likedBy.includes(currentUserId));
-                console.log(likedBy.length)
                 setLikesCount(likedBy.length);
             } catch (error) {
                 console.error('Error checking if post is liked:', error);
@@ -81,7 +77,7 @@ const PostScreen = ({ route }) => {
                         const user = auth.currentUser;
                         if (user) {
                             const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
-                            setIsFavorite(exists);
+                            setIsRestaurantFavorite(exists);
                         }
                     }
                 }
@@ -190,27 +186,31 @@ const PostScreen = ({ route }) => {
     };
 
     
-    const toggleFavorite = async () => {
+    const toggleRestaurantFavorite = async () => {
         try {
-            setIsFavorite(!isFavorite);
+            console.log('IsRestaurantFavorite:', isRestaurantFavorite); 
+            setIsRestaurantFavorite(!isRestaurantFavorite);
             const user = auth.currentUser;
         
             if (user && restaurant) {
-            const favoriteData = {
-                place_id: post.place_id,
-                name: restaurant.name,
-                address: restaurant.formatted_address,
-                rating: restaurant.rating,
-                timestamp: new Date(),
-                photo_reference: restaurant.photos[0].photo_reference,
-            };
+                console.log(post.place_id);
+                const favoriteData = {
+                    place_id: post.place_id,
+                    name: restaurant.name,
+                    address: restaurant.formatted_address,
+                    rating: restaurant.rating,
+                    timestamp: new Date(),
+                    photo_reference: restaurant.photos[0].photo_reference,
+                };
         
-            if (!isFavorite) {
+            if (!isRestaurantFavorite) {
                 // Adding to favorites
-                await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, place_id);
+                await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                console.log("Added to favorites");
             } else {
                 // Removing from favorites
-                await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, place_id);
+                await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                console.log("Removed from favorites");
             }
             } else {
             console.error('User not logged in or restaurant data unavailable');
@@ -246,11 +246,11 @@ const PostScreen = ({ route }) => {
                         </View>
 
                     <View style={commonStyles.likeSection}>
-                        <PressableButton onPress={toggleFavorite} >
+                        <PressableButton onPress={toggleRestaurantFavorite} >
                         <Ionicons 
-                            name={isFavorite ? 'heart' : 'heart-outline'} 
+                            name={isRestaurantFavorite ? 'heart' : 'heart-outline'} 
                             size={24} 
-                            color={isFavorite ? 'red' : 'black'} 
+                            color={isRestaurantFavorite ? 'red' : 'black'} 
                         />
                         </PressableButton>
                     </View>
