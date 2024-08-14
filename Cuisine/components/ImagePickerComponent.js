@@ -2,9 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, FlatList, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker'; // Import image picker from Expo
 import { MaterialIcons } from '@expo/vector-icons'; // Import icons for UI
+import { ref, deleteObject } from 'firebase/storage';
+import { storage } from '../Firebase/firebaseSetup'; // Adjust the path as needed
 
-const ImagePickerComponent = ({ onImageSelect }) => {
+const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage, isEditMode = false }) => {
   const [selectedImages, setSelectedImages] = useState([]); // State to store the selected image URIs
+
+  useEffect(() => {
+    setSelectedImages(initialImages);
+  }, [initialImages]);
 
   // Function to request camera and media library permissions
   const requestPermissions = async () => {
@@ -84,7 +90,13 @@ const ImagePickerComponent = ({ onImageSelect }) => {
     const updatedImages = selectedImages.filter((imageUri) => imageUri !== uri);
     setSelectedImages(updatedImages);
     if (typeof onImageSelect === 'function') {
-      onImageSelect(updatedImages); // Update parent with new list
+      onImageSelect(updatedImages);
+    }
+
+    // Notify the parent component if the image should be removed from storage
+    if (isEditMode && typeof onRemoveImage === 'function') {
+      const isStoredInStorage = uri.startsWith("https://firebasestorage.googleapis.com");
+      onRemoveImage(uri, isStoredInStorage);
     }
   };
 
