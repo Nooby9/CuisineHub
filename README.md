@@ -229,3 +229,39 @@ npx expo start --tunnel
 
    - Modified the system to store the author of posts and comments as UIDs instead of usernames.
    - On display, the system retrieves the latest username from Firestore based on the UID, ensuring that any changes to the username are correctly reflected across the application.
+
+
+#### Shurui Xu
+
+1. **User From Firebase Auth in Firebase Storage**:
+
+- When a new user registers, they will be automatically added to firebase storage using the Firebase Auth id. 
+
+2. **User FavoriteRestaurant Subcollection**:
+
+   - When a user likes/favorites a restaurant, the restaurant will be added to a subcollection in user.
+   - When a user unfavorites a restaurant, the restaurant will be removed from that subcollection. 
+
+3. **Login Page**:
+
+   - Users can login through their email and password if they have registered before
+   - User can click on forgot password to send a reset password email to their email
+   - User can switch to signup page if them have not registered yet
+  
+
+     ![login page](image/README/login_page.png)
+4. **Singup Page**:
+
+   - Users can signup with an email, password, and username
+   - The password is checked for strength
+   - User must choose a strong enough password
+   - User is required to confirm their password by entering it again
+   - User will see a password do not match indicator if the password and confirm password do not match
+
+     ![signup page](image/README/register_user_page.png)
+5. **Favorites Page**:
+   - The Favorites Page displays a list of favorite restaurants that the user has marked
+   - The User can click on a restaurant and unfavorite them
+   - Favorite button is synchornized and fetched dynamically, meaning that the favorite state is feteched from the database and displayed depending on whether the restaurant exists in the FavoriteRestaurant subcollection
+   ![favorites page](image/README/favorites_page.png)
+   ![restaurant details with favorite page](image/README/restaurant_detail_with_favorite_page.png)
