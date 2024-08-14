@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -25,9 +25,8 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [pendingDeletions, setPendingDeletions] = useState([]); // Track pending deletions
     const [isSubmitting, setIsSubmitting] = useState(false); // State of pressing the post button
-    const [author, setAuthor] = useState('');
+    const [author, setAuthor] = useState("");
     const { post, mode } = route.params || {};
-
     const currentUserId = auth.currentUser.uid;
 
 
@@ -98,11 +97,19 @@ const PostEditorScreen = ({ navigation, route }) => {
     async function deleteImageFromStorage(imageUrl) {
         try {
             const imageRef = ref(storage, imageUrl);
-            console.log("imageRef", imageRef)
+            console.log("Delete image from storage:", imageUrl)
             await deleteObject(imageRef);
         } catch (error) {
             console.error("Error deleting image: ", error);
         }
+    }
+
+    function getStoragePathFromUrl(url) {
+        const decodedUrl = decodeURIComponent(url);
+        const baseUrl = 'https://firebasestorage.googleapis.com/v0/b/groupproject-81f8f.appspot.com/o/';
+        const filePath = decodedUrl.substring(baseUrl.length, decodedUrl.indexOf('?alt=media'));
+
+        return filePath;
     }
 
     // Callback function to handle image selection
@@ -171,21 +178,36 @@ const PostEditorScreen = ({ navigation, route }) => {
         setIsSubmitting(true);
 
         try {
+            let deletedImagePaths = [];
             // Delete pending images from storage
             if (mode === 'edit') {
                 await Promise.all(pendingDeletions.map(deleteImageFromStorage));
+                if (pendingDeletions.length > 0) {
+                    deletedImagePaths = pendingDeletions.map(getStoragePathFromUrl);
+                    console.log("Updated deletedImages:", deletedImagePaths);
+                }
             }
 
-            // Upload images and get their URLs
-            const imageUrls = await Promise.all(images.map(imageUri => uploadImageToStorage(imageUri)));
+            // Separate existing images (those already in post.imageUrls) and new images (local URIs)
+            const newImages = images.filter(imageUri => !imageUri.startsWith("https://"));
+
+            // Upload only new images and get their URIs
+            const uploadedImageUris = await Promise.all(newImages.map(imageUri => uploadImageToStorage(imageUri)));
+
+
 
             let postData;
 
             if (mode === 'edit' && post.id) {
+                // Combine existing image URIs with newly uploaded ones
+                const finalImageUris = [...post.imageUrls.filter(url => !deletedImagePaths.includes(url)),
+                ...uploadedImageUris];
+                console.log("finalImageUris:", finalImageUris)
+
                 // Retain the existing likedBy, date, and comments when editing
                 postData = {
                     title,
-                    imageUrls: imageUrls,
+                    imageUrls: finalImageUris,
                     place_id: placeId,
                     author: post.author,
                     comment: content,
@@ -194,10 +216,10 @@ const PostEditorScreen = ({ navigation, route }) => {
                     comments: post.comments, // Retain existing comments
                 };
             } else {
-                 // Create a new post with default likedBy, date, and comments
+                // Create a new post with default likedBy, date, and comments
                 postData = {
                     title,
-                    imageUrls: imageUrls,
+                    imageUrls: uploadedImageUris,
                     place_id: placeId,
                     author: currentUserId,
                     comment: content,
