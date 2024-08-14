@@ -6,13 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import { getUserName, updateDB } from '../Firebase/firestoreHelper';
-import { ref, getDownloadURL } from 'firebase/storage';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
 import { arrayUnion } from 'firebase/firestore';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 
 // Define collection name
@@ -176,7 +176,11 @@ const PostScreen = ({ route }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={80} // Adjust this value based on your header height or needs
+        >
             <ScrollView style={styles.container}>
                 <FlatList
                     data={imageUrls}
@@ -271,7 +275,7 @@ const PostScreen = ({ route }) => {
                     </View>
                 </Pressable>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -338,7 +342,7 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
     },
-    
+
     title: {
         fontSize: 18,
         fontWeight: 'bold',
