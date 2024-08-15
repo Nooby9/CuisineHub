@@ -38,7 +38,7 @@ const DiscoverScreen = () => {
           });
 
           postsArray = await Promise.all(promises);
-          // Sort the posts array based on the given criteria
+          
           postsArray.sort((a, b) => {
             // If dates are equal, sort by like count (most liked first)
             const likesComparison = (b.likedBy?.length || 0) - (a.likedBy?.length || 0);
