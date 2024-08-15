@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker'; // Import image picker from Ex
 import { MaterialIcons } from '@expo/vector-icons'; // Import icons for UI
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../Firebase/firebaseSetup'; // Adjust the path as needed
+import { colors } from '../style';
 
 const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage, isEditMode = false }) => {
   const [selectedImages, setSelectedImages] = useState([]); // State to store the selected image URIs
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background for visibility
+    backgroundColor: colors.deleteButtonBg, // Semi-transparent background for visibility
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

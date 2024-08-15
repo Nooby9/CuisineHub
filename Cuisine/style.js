@@ -21,6 +21,10 @@ export const colors = {
     commentText:'#888',
     likeBg: 'paleturquoise',
     addCommentButton: '#4CAF50',
+    loadingBg:'rgba(255, 255, 255, 0.7)',
+    dividerBg: 'rgba(204, 204, 204, 0.3)',
+    deleteButtonBg: 'rgba(0, 0, 0, 0.5)',
+    itemBorder:'#eee',
 };
 // Define common styles used across the app
 export const commonStyles = StyleSheet.create({

@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+        backgroundColor: colors.loadingBg, // Semi-transparent background
     },
     loadingText: {
         marginTop: 10,
@@ -226,27 +226,6 @@ const styles = StyleSheet.create({
     postList: {
         padding: 10,
     },
-    postCardContainer: {
-        width: '48%',
-        marginBottom: 10,
-        position: 'relative', // Ensure the edit/delete buttons are positioned correctly
-    },
-    actionButton: {
-        position: 'absolute',
-        zIndex: 1, // Ensure it is on top of the PostItem component
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Background to make it visible
-        padding: 5, // Optional: Adjust padding
-        borderRadius: 50, // Circular background for better visibility
-    },
-    editButton: {
-        top: 5, // Aligns the edit button to the top of the post
-        right: 5, // Aligns the edit button to the right of the post
-    },
-    deleteButton: {
-        bottom: 5, // Aligns the delete button to the bottom of the post
-        right: 5, // Aligns the delete button to the right of the post
-    },
-
 });
 
 export default FoodJournalScreen;

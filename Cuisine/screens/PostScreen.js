@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: 'rgba(204, 204, 204, 0.3)',
+        backgroundColor: colors.dividerBg,
         marginVertical: 5,
     },
     fab: {
