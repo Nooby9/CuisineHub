@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, FlatList, Image, Pressable } from 'react-native';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { auth } from '../Firebase/firebaseSetup';
+import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
 
 const fetchPlaceDetails = async (place_id) => {
   try {
@@ -9,7 +13,7 @@ const fetchPlaceDetails = async (place_id) => {
       params: {
         place_id: place_id,
         key: googlePlacesApiKey,
-        fields: 'name,rating,opening_hours,formatted_address,photos', 
+        fields: 'name,rating,opening_hours,formatted_address,photos',
       },
     });
     return response.data.result;
@@ -24,11 +28,11 @@ const getPhotoUrl = (photoReference, maxWidth = 400) => {
 };
 
 const RestaurantScreen = ({ route }) => {
+  const navigation = useNavigation();
   const place_id = route.params.place_id;
-  console.log("params: ",route.params);
-  console.log("place_id: ",place_id);
   const [restaurant, setRestaurant] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,10 +45,62 @@ const RestaurantScreen = ({ route }) => {
           );
           setPhotos(photoUrls);
         }
+
+        // Check if the restaurant is already a favorite
+        const user = auth.currentUser;
+        if (user) {
+          const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, place_id);
+          setIsFavorite(exists);
+        }
       }
     };
     fetchData();
   }, [place_id]);
+
+  const toggleFavorite = async () => {
+    setIsFavorite(!isFavorite);
+    const user = auth.currentUser;
+
+    if (user && restaurant) {
+      const favoriteData = {
+        place_id: place_id,
+        name: restaurant.name,
+        address: restaurant.formatted_address,
+        rating: restaurant.rating,
+        timestamp: new Date(),
+        photo_reference: restaurant.photos[0].photo_reference,
+      };
+
+      if (!isFavorite) {
+        // Adding to favorites
+        await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, place_id);
+      } else {
+        // Removing from favorites
+        await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, place_id);
+      }
+    } else {
+      console.error('User not logged in or restaurant data unavailable');
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable 
+          onPress={toggleFavorite} 
+          style={styles.favoriteButton}
+          disabled={!restaurant} // Disable button if restaurant data is not yet available
+        >
+          <Ionicons 
+            name={isFavorite ? 'heart' : 'heart-outline'} 
+            size={24} 
+            color={isFavorite ? 'red' : 'black'} 
+          />
+        </Pressable>
+      ),
+    });
+  }, [navigation, isFavorite, restaurant]);
+  
 
   const renderImage = ({ item }) => (
     <Image source={{ uri: item }} style={styles.postImage} />
@@ -75,9 +131,6 @@ const RestaurantScreen = ({ route }) => {
         <View style={styles.locationLeft}>
           <Text style={styles.locationTitle}>Location: </Text>
           <Text style={styles.location}>{restaurant.formatted_address || 'No address available'}</Text>
-        </View>
-        <View style={styles.locationRight}>
-          <Text>{">"}</Text>
         </View>
       </View>
     </ScrollView>
@@ -142,5 +195,8 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 14,
     paddingTop: 5,
+  },
+  favoriteButton: {
+    marginRight: 15,
   },
 });
