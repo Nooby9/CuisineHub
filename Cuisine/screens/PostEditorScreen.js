@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { getUserName, writeToDB, deleteFromDB, updateDB } from '../Firebase/firestoreHelper';
+import { ref, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { writeToDB, deleteFromDB, updateDB } from '../Firebase/firestoreHelper';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import PressableButton from '../components/PressableButton';
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the ImagePickerComponent
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.pressedButton, // Change color to gray when pressed or disabled
     },
     postButtonText: {
-        color: colors.buttonText,
+        color: colors.white,
         fontSize: 18,
         fontWeight: 'bold',
     },

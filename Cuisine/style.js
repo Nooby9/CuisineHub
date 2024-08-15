@@ -5,6 +5,7 @@ export const colors = {
     background: '#fff',
     currentLocation: 'blue',
     textDark: '#333',
+    textLight: '#777',
     orchidBG: 'mediumorchid',
     headerText: '#FFFFFF',
     rippleEffect: 'darkseagreen',
@@ -13,9 +14,13 @@ export const colors = {
     borderBottom: '#eee',
     postButtonBg: '#ff3b30',
     pressedButton: '#aaa',
-    buttonText: '#ffffff',
+    white: '#ffffff',
     favorite: 'hotpink',
-    notFavorite: '#AAA'
+    notFavorite: '#AAA',
+    restaurantSecBg: 'lemonchiffon',
+    commentText:'#888',
+    likeBg: 'paleturquoise',
+    addCommentButton: '#4CAF50',
 };
 // Define common styles used across the app
 export const commonStyles = StyleSheet.create({

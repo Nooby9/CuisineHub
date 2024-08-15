@@ -9,6 +9,7 @@ import { database, auth } from '../Firebase/firebaseSetup';
 import PostItem from '../components/PostItem';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
 import { useNavigation } from '@react-navigation/native';
+import { colors } from '../style';
 
 
 const FoodJournalScreen = ({ navigation }) => {
@@ -187,7 +188,7 @@ const FoodJournalScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     mapContainer: {
         position: 'relative', // Allows the loading overlay to be positioned absolutely within the map container
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     markerText: {
-        color: 'blue',
+        color: colors.currentLocation,
         fontSize: 8,
         marginBottom: 2,
         fontWeight: 'bold',
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 10,
         fontSize: 18,
-        color: '#333', // Dark text color for visibility
+        color: colors.textDark, // Dark text color for visibility
         fontWeight: 'bold',
     },
     postList: {

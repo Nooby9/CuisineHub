@@ -282,7 +282,7 @@ const PostScreen = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     postImage: {
         width: 300,
@@ -295,14 +295,14 @@ const styles = StyleSheet.create({
     },
     comment: {
         fontSize: 16,
-        color: '#333',
+        color: colors.textDark,
     },
     restaurantSection: {
         padding: 15,
-        borderColor: 'white',
+        borderColor: colors.white,
         borderWidth: 8,
         borderRadius: 15,
-        backgroundColor: 'lemonchiffon',
+        backgroundColor: colors.restaurantSecBg,
     },
     restaurantInfo: {
         flexDirection: 'row',
@@ -318,35 +318,35 @@ const styles = StyleSheet.create({
     restaurantName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.textDark,
     },
     restaurantRating: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     restaurantAddress: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     date: {
         fontSize: 13,
-        color: '#777',
+        color: colors.textLight,
         alignItems: 'center',
         marginHorizontal: 15
     },
     location: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     titleSection: {
         padding: 10,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
 
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.textDark,
         textAlign: 'center',
         textAlign: 'left',
     },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     },
     commentDate: {
         fontSize: 12,
-        color: '#888',
+        color: colors.commentText,
         marginBottom: 5,
     },
     divider: {
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         right: 20,
-        backgroundColor: 'paleturquoise',
+        backgroundColor: colors.likeBg,
         borderRadius: 50,
         width: 60, // Adjust the width to ensure it remains circular
         height: 60, // Ensure the height is the same as the width for circular shape
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     },
     likesCount: {
         fontSize: 12,
-        color: '#777',
+        color: colors.textLight,
         marginTop: 2, // Small margin between the icon and the text
     },
 
@@ -409,20 +409,20 @@ const styles = StyleSheet.create({
     commentInput: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: colors.border,
         borderRadius: 20,
         padding: 10,
         marginRight: 10,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     addCommentButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: colors.addCommentButton,
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderRadius: 20,
     },
     addCommentButtonText: {
-        color: '#fff',
+        color: colors.background,
         fontWeight: 'bold',
     },
 
