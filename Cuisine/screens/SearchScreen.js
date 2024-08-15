@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, View, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, View, FlatList, Image, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
@@ -11,6 +11,7 @@ const SearchScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(true); // Add locationLoading state
   const [region, setRegion] = useState({
     latitude: 37.4161493,
     longitude: -122.0812166,
@@ -20,10 +21,12 @@ const SearchScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
-      // Request user location permission
+      setLocationLoading(true); // Start loading when requesting location
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.error('Location permission not granted');
+        alert('Permission to access current location was denied. Please enable location services in your settings.');
+        setLocationLoading(false); // Stop loading even if permission is denied
         return;
       }
 
@@ -35,6 +38,8 @@ const SearchScreen = ({ navigation }) => {
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       });
+
+      setLocationLoading(false); // Stop loading when location is retrieved
     })();
   }, []);
 
@@ -66,7 +71,6 @@ const SearchScreen = ({ navigation }) => {
   const updateMapRegion = (places) => {
     if (places.length === 0) return;
 
-    // Use the coordinates of the first restaurant
     const firstPlace = places[0];
     setRegion({
       latitude: firstPlace.geometry.location.lat,
@@ -81,7 +85,7 @@ const SearchScreen = ({ navigation }) => {
   };
 
   const handleRestaurantPress = (restaurant) => {
-    navigation.navigate('Restaurant', { place_id:restaurant.place_id });
+    navigation.navigate('Restaurant', { place_id: restaurant.place_id });
   };
 
   const renderRestaurant = ({ item }) => (
@@ -99,6 +103,16 @@ const SearchScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  // Display loading until location is fetched
+  if (locationLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Fetching location...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -112,10 +126,7 @@ const SearchScreen = ({ navigation }) => {
           <Ionicons name="search" size={24} color="black" />
         </PressableButton>
       </View>
-      <MapView
-        style={styles.map}
-        region={region}
-      >
+      <MapView style={styles.map} region={region}>
         {restaurants.map((restaurant) => (
           <Marker
             key={restaurant.place_id}
@@ -148,6 +159,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    paddingLeft: 0
   },
   searchContainer: {
     flexDirection: 'row',
@@ -184,5 +196,10 @@ const styles = StyleSheet.create({
     height: 200,
     marginTop: 10,
     borderRadius: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
