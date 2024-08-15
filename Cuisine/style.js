@@ -2,23 +2,18 @@ import { StyleSheet } from 'react-native';
 
 // Define colors for the app
 export const colors = {
-    primary: '#6200EE',
-    secondary: '#03DAC6',
-    backgroundLight: '#D8BFD8',
-    backgroundDark: 'mediumpurple',
-    textLight: '#4B0082',
-    textDark: '#FFFFFF',
+    background: '#fff',
+    currentLocation: 'blue',
+    textDark: '#333',
     orchidBG: 'mediumorchid',
     headerText: '#FFFFFF',
     rippleEffect: 'darkseagreen',
     alertIcon: '#FFD700',
-    leftButton: "#8B0000",
-    rightButton: "#4B0082",
-    itemBackground: '#4B0082',
-    itemText: '#4B0082',
-    itemTextBG: '#FFFFFF',
-    inputBorder: '#4B0082',
-    checkedCheckbox: '#4630EB',
+    border: '#ccc',
+    borderBottom: '#eee',
+    postButtonBg: '#ff3b30',
+    pressedButton: '#aaa',
+    buttonText: '#ffffff',
     favorite: 'hotpink',
     notFavorite: '#AAA'
 };

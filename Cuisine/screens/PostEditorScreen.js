@@ -10,6 +10,7 @@ import ImagePickerComponent from '../components/ImagePickerComponent'; // Import
 import { googlePlacesApiKey } from '@env'; // Import your Google Places API key
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import { fetchImageUrls } from '../utils/CommonMethod'; // Adjust the path as needed
+import { colors } from '../style';
 
 
 // Define collection name
@@ -362,17 +363,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: colors.border,
         borderRadius: 5,
         padding: 10,
         marginBottom: 15,
     },
     textArea: {
-        // flex: 1,
         height: 80,
         textAlignVertical: 'top',
     },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: colors.border,
         borderRadius: 5,
         padding: 10,
         marginRight: 5
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
         maxHeight: 200,
         minHeight: 200,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: colors.border,
         borderRadius: 5,
         marginTop: 5,
     },
     dropdownItem: {
         padding: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: colors.borderBottom,
     },
     dropdownText: {
         fontSize: 16,
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     },
     postButton: {
         height: 40,
-        backgroundColor: '#ff3b30',
+        backgroundColor: colors.postButtonBg,
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
@@ -427,10 +427,10 @@ const styles = StyleSheet.create({
     },
     pressedStyle: {
         opacity: 0.8,
-        backgroundColor: '#aaa', // Change color to gray when pressed or disabled
+        backgroundColor: colors.pressedButton, // Change color to gray when pressed or disabled
     },
     postButtonText: {
-        color: '#ffffff',
+        color: colors.buttonText,
         fontSize: 18,
         fontWeight: 'bold',
     },

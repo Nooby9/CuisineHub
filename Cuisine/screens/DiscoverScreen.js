@@ -6,6 +6,7 @@ import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/fire
 import { database } from '../Firebase/firebaseSetup';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import { useNavigation  } from '@react-navigation/native';
+import { colors } from '../style';
 
 
 // Define collection name
@@ -62,7 +63,7 @@ const DiscoverScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   loaderContainer: {
     flex: 1,
