@@ -38,6 +38,17 @@ const DiscoverScreen = () => {
           });
 
           postsArray = await Promise.all(promises);
+          // Sort the posts array based on the given criteria
+          postsArray.sort((a, b) => {
+            // If dates are equal, sort by like count (most liked first)
+            const likesComparison = (b.likedBy?.length || 0) - (a.likedBy?.length || 0);
+            if (likesComparison !== 0) return likesComparison;
+            // First, sort by date (most recent first)
+            const dateComparison = new Date(b.date) - new Date(a.date);
+            if (dateComparison !== 0) return dateComparison;
+            // If likes are equal, sort by comment count (most comments first)
+            return (b.comments?.length || 0) - (a.comments?.length || 0);
+          });
         }
 
         setPosts(postsArray);
