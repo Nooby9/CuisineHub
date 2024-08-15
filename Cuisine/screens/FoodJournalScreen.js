@@ -88,17 +88,23 @@ const FoodJournalScreen = ({ navigation }) => {
                     };
                 });
 
-
                 postsArray = await Promise.all(promises);
+
+                // Sort posts first by date (descending) and then by likes count (descending)
+                postsArray.sort((a, b) => {
+                    // First, sort by date (most recent first)
+                    const dateComparison = new Date(b.date) - new Date(a.date);
+                    if (dateComparison !== 0) return dateComparison;
+
+                    // If dates are equal, sort by like count (most liked first)
+                    return (b.likedBy?.length || 0) - (a.likedBy?.length || 0);
+                });
             }
 
             setPosts(postsArray);
         }
         );
         return () => unsubscribe(); // Cleanup subscription on unmount
-
-
-
     }, []);
 
     // Handle post deletion
