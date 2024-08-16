@@ -35,6 +35,7 @@ const haversineDistance = (coords1, coords2) => {
 
 const DiscoverScreen = () => {
   const [posts, setPosts] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(null);
   const navigation = useNavigation();
 
   function getPostDetailPress(post){
@@ -68,13 +69,25 @@ const DiscoverScreen = () => {
           const promises = querySnapshot.docs.map(async (doc) => {
             const postData = doc.data();
 
-            return {
-              id: doc.id,
-              ...postData
-            };
+            // Calculate distance from the current location to the post's location
+            const distance = haversineDistance(currentLocation, {
+              latitude: postData.location.latitude,
+              longitude: postData.location.longitude,
+            });
+
+            // Filter out posts that restaurant is more than 40 km away
+            if (distance <= 40) {
+              return {
+                id: doc.id,
+                distance,
+                ...postData,
+              };
+            } else {
+              return null;
+            }
           });
 
-          postsArray = await Promise.all(promises);
+          postsArray = (await Promise.all(promises)).filter(Boolean);
           
           postsArray.sort((a, b) => {
             // If dates are equal, sort by like count (most liked first)
