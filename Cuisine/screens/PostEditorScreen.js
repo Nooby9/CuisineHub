@@ -26,7 +26,7 @@ const PostEditorScreen = ({ navigation, route }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [pendingDeletions, setPendingDeletions] = useState([]); // Track pending deletions
     const [isSubmitting, setIsSubmitting] = useState(false); // State of pressing the post button
-    const [author, setAuthor] = useState("");
+    const [location, setLocation] = useState(null); // State to store selected place location
     const { post, mode } = route.params || {};
     const currentUserId = auth.currentUser.uid;
 
@@ -41,7 +41,6 @@ const PostEditorScreen = ({ navigation, route }) => {
                     setContent(post.comment);
                     setPlaceId(post.place_id);
                     setSearchQuery(post.placeDetails ? post.placeDetails.name : '');
-                    setAuthor(post.author);
 
                     // Add delete button to the header
                     navigation.setOptions({
@@ -147,6 +146,14 @@ const PostEditorScreen = ({ navigation, route }) => {
         setPlaceId(restaurant.place_id); // Set selected restaurant's place_id
         setSearchQuery(restaurant.name); // Update search query with selected restaurant's name
         setShowDropdown(false); // Hide dropdown after selection
+
+        // Store the location (latitude and longitude)
+        if (restaurant.geometry && restaurant.geometry.location) {
+            setLocation({
+                latitude: restaurant.geometry.location.lat,
+                longitude: restaurant.geometry.location.lng,
+            });
+        }
     };
 
     // Function to handle post submission
@@ -210,6 +217,7 @@ const PostEditorScreen = ({ navigation, route }) => {
                     title,
                     imageUrls: finalImageUris,
                     place_id: placeId,
+                    location: location,
                     author: post.author,
                     comment: content,
                     likedBy: post.likedBy, // Retain existing likedBy
@@ -222,6 +230,7 @@ const PostEditorScreen = ({ navigation, route }) => {
                     title,
                     imageUrls: uploadedImageUris,
                     place_id: placeId,
+                    location: location,
                     author: currentUserId,
                     comment: content,
                     likedBy: [],
