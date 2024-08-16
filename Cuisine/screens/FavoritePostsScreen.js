@@ -12,7 +12,7 @@ const FavoritePostsScreen = ({ navigation }) => {
       const user = auth.currentUser;
       if (user) {
         const favorites = await getFavoritePosts(user.uid); // Fetch favorite posts
-        console.log('Favorite posts:', favorites);
+        //console.log('Favorite posts:', favorites);
         setFavoritePosts(favorites);
       }
     };
