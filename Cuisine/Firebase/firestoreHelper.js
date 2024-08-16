@@ -184,6 +184,7 @@ export async function getFavoritePosts(userId) {
       // Combine the post details with favorite post data
       return {
         ...postDocSnapshot.data(),
+        id: favoritePost.post_id,
         timestamp: favoritePost.timestamp, // Include the timestamp or any other metadata from FavoritePost
       };
     });
