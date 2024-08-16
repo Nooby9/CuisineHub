@@ -7,10 +7,31 @@ import { database } from '../Firebase/firebaseSetup';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import { useNavigation  } from '@react-navigation/native';
 import { colors } from '../style';
+import * as Location from 'expo-location';
 
-
-// Define collection name
 const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
+
+// Helper function to calculate the distance between two coordinates in kilometers
+const haversineDistance = (coords1, coords2) => {
+  const toRad = (x) => (x * Math.PI) / 180;
+
+  const lat1 = coords1.latitude;
+  const lon1 = coords1.longitude;
+  const lat2 = coords2.latitude;
+  const lon2 = coords2.longitude;
+
+  const R = 6371; // Earth's radius in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+  return distance;
+};
 
 const DiscoverScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -20,6 +41,22 @@ const DiscoverScreen = () => {
     navigation.navigate('Post', { post});
   }
 
+  // Fetch the user's current location
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setCurrentLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
