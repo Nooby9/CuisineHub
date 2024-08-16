@@ -156,8 +156,8 @@ const FoodJournalScreen = ({ navigation }) => {
                         <Marker
                             key={post.place_id}
                             coordinate={{
-                                latitude: post.placeDetails.geometry.location.lat,
-                                longitude: post.placeDetails.geometry.location.lng,
+                                latitude: post.location.latitude,
+                                longitude: post.location.longitude,
                             }}
                             title={post.placeDetails.name}
                             description={
