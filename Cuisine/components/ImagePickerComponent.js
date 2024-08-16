@@ -13,13 +13,21 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
     setSelectedImages(initialImages);
   }, [initialImages]);
 
-  // Function to request camera and media library permissions
-  const requestPermissions = async () => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  // Function to request camera permissions
+  const requestCameraPermissions = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Camera Permission Required', 'Please grant camera permission to use this feature.');
+      return false;
+    }
+    return true;
+  };
 
-    if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
-      Alert.alert('Permissions Required', 'Please grant camera and media library permissions to use this feature.');
+  // Function to request media library permissions
+  const requestMediaLibraryPermissions = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Media Library Permission Required', 'Please grant media library permission to use this feature.');
       return false;
     }
     return true;
@@ -27,7 +35,7 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
 
   // Function to pick multiple images from the gallery
   const pickImages = async () => {
-    const hasPermission = await requestPermissions(); // Check for permissions
+    const hasPermission = await requestMediaLibraryPermissions(); // Check for permissions
     if (!hasPermission) return;
 
     if (selectedImages.length >= 9) {
@@ -57,7 +65,7 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
 
   // Function to take a photo using the camera
   const takePhoto = async () => {
-    const hasPermission = await requestPermissions(); // Check for permissions
+    const hasPermission = await requestCameraPermissions(); // Check for permissions
     if (!hasPermission) return;
 
     if (selectedImages.length >= 9) {
