@@ -55,7 +55,6 @@ const PostItem = ({ item, onPress }) => {
   async function fetchLikeData() {
     try {
       const likedBy = await fetchArrayDataByField(COLLECTION_NAME, item.id, 'likedBy');
-
       setIsFavorite(likedBy.includes(currentUserId));
       setLikesCount(likedBy.length);
     } catch (error) {
@@ -85,7 +84,7 @@ const PostItem = ({ item, onPress }) => {
 
     try {
       if (newFavoriteState) {
-        await writeWithIdToDB({timestamp:new Date()}, `User/${currentUserId}/FavoritePost`, item.id);
+        await writeWithIdToDB({timestamp:new Date(), post_id: item.id}, `User/${currentUserId}/FavoritePost`, item.id);
       }
       else {
         await deleteWithIdFromDB(`User/${currentUserId}/FavoritePost`, item.id);

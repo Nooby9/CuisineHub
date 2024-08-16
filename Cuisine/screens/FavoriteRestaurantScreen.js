@@ -5,7 +5,7 @@ import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
 import { googlePlacesApiKey } from '@env';
 
-const FavoriteScreen = ({ navigation }) => {
+const FavoriteRestaurantScreen = ({ navigation }) => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
 
   useEffect(() => {
@@ -30,7 +30,6 @@ const FavoriteScreen = ({ navigation }) => {
 
   const renderRestaurant = ({ item }) => (
     <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
-      {console.log(item)}
       {item.photo_reference && (
         <Image
           source={{ uri: getPhotoUrl(item.photo_reference) }}
@@ -58,7 +57,7 @@ const FavoriteScreen = ({ navigation }) => {
   );
 };
 
-export default FavoriteScreen;
+export default FavoriteRestaurantScreen;
 
 const styles = StyleSheet.create({
   container: {
