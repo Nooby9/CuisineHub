@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { query, where, collection, onSnapshot } from 'firebase/firestore';
 import * as Location from 'expo-location';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
-import { database } from '../Firebase/firebaseSetup';
+import { database, auth } from '../Firebase/firebaseSetup';
 import PostItem from '../components/PostItem';
 import { fetchPlaceDetails } from '../utils/CommonMethod';
-import { useNavigation  } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../style';
 
 
 const FoodJournalScreen = ({ navigation }) => {
@@ -18,9 +19,11 @@ const FoodJournalScreen = ({ navigation }) => {
         // Initial region setup for the map
         latitude: 37.4161493,
         longitude: -122.0812166,
-        latitudeDelta: 0.35,
-        longitudeDelta: 0.35,
+        latitudeDelta: 0.15,
+        longitudeDelta: 0.15,
     });
+    const [currentLocation, setCurrentLocation] = useState(null); // State to store current location
+    const currentUserId = auth.currentUser.uid;
 
     // Define collection name
     const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
@@ -42,8 +45,13 @@ const FoodJournalScreen = ({ navigation }) => {
                 setRegion({
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
-                    latitudeDelta: 0.35,
-                    longitudeDelta: 0.35,
+                    latitudeDelta: 0.15,
+                    longitudeDelta: 0.15,
+                });
+                // Store current location for marker
+                setCurrentLocation({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
                 });
             } catch (error) {
                 console.error('Error fetching location:', error);
@@ -55,39 +63,48 @@ const FoodJournalScreen = ({ navigation }) => {
 
     // Fetch user's posts and get user location on component mount
     useEffect(() => {
-        const unsubscribe = onSnapshot(
+        const userPostsQuery = query(
             collection(database, COLLECTION_NAME),
-            async (querySnapshot) => {
-                let postsArray = [];
+            where('author', '==', currentUserId)
+        );
 
-                if (!querySnapshot.empty) {
-                    const promises = querySnapshot.docs.map(async (doc) => {
-                        const postData = doc.data();
+        const unsubscribe = onSnapshot(userPostsQuery, async (querySnapshot) => {
+            let postsArray = [];
 
-                        // Fetch additional place details
-                        let placeDetails = {};
-                        if (postData.place_id) {
-                            placeDetails = await fetchPlaceDetails(postData.place_id);
-                        }
+            if (!querySnapshot.empty) {
+                const promises = querySnapshot.docs.map(async (doc) => {
+                    const postData = doc.data();
 
-                        return {
-                            id: doc.id,
-                            ...postData,
-                            placeDetails,
-                        };
-                    });
+                    // Fetch additional place details
+                    let placeDetails = {};
+                    if (postData.place_id) {
+                        placeDetails = await fetchPlaceDetails(postData.place_id);
+                    }
 
+                    return {
+                        id: doc.id,
+                        ...postData,
+                        placeDetails,
+                    };
+                });
 
-                    postsArray = await Promise.all(promises);
-                }
+                postsArray = await Promise.all(promises);
 
-                setPosts(postsArray);
+                // Sort posts first by date (descending) and then by likes count (descending)
+                postsArray.sort((a, b) => {
+                    // First, sort by date (most recent first)
+                    const dateComparison = new Date(b.date) - new Date(a.date);
+                    if (dateComparison !== 0) return dateComparison;
+
+                    // If dates are equal, sort by like count (most liked first)
+                    return (b.likedBy?.length || 0) - (a.likedBy?.length || 0);
+                });
             }
+
+            setPosts(postsArray);
+        }
         );
         return () => unsubscribe(); // Cleanup subscription on unmount
-
-
-
     }, []);
 
     // Handle post deletion
@@ -126,12 +143,21 @@ const FoodJournalScreen = ({ navigation }) => {
                     style={styles.map}
                     region={region}
                 >
+                    {currentLocation && (
+                        <Marker coordinate={currentLocation} pinColor="blue">
+                            <View style={styles.markerContainer}>
+                                <Text style={styles.markerText}>Your Location</Text>
+                                <Ionicons name="location-sharp" size={24} color="blue" />
+                            </View>
+                        </Marker>
+                    )}
+
                     {posts.map((post) => (
                         <Marker
                             key={post.place_id}
                             coordinate={{
-                                latitude: post.placeDetails.geometry.location.lat,
-                                longitude: post.placeDetails.geometry.location.lng,
+                                latitude: post.location.latitude,
+                                longitude: post.location.longitude,
                             }}
                             title={post.placeDetails.name}
                             description={
@@ -168,7 +194,7 @@ const FoodJournalScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     mapContainer: {
         position: 'relative', // Allows the loading overlay to be positioned absolutely within the map container
@@ -178,6 +204,15 @@ const styles = StyleSheet.create({
     map: {
         ...StyleSheet.absoluteFillObject, // Makes the map fill the entire container
     },
+    markerContainer: {
+        alignItems: 'center',
+    },
+    markerText: {
+        color: colors.currentLocation,
+        fontSize: 8,
+        marginBottom: 2,
+        fontWeight: 'bold',
+    },
     loadingOverlay: {
         position: 'absolute',
         top: 0,
@@ -186,38 +221,17 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+        backgroundColor: colors.loadingBg, // Semi-transparent background
     },
     loadingText: {
         marginTop: 10,
         fontSize: 18,
-        color: '#333', // Dark text color for visibility
+        color: colors.textDark, // Dark text color for visibility
         fontWeight: 'bold',
     },
     postList: {
         padding: 10,
     },
-    postCardContainer: {
-        width: '48%',
-        marginBottom: 10,
-        position: 'relative', // Ensure the edit/delete buttons are positioned correctly
-    },
-    actionButton: {
-        position: 'absolute',
-        zIndex: 1, // Ensure it is on top of the PostItem component
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Background to make it visible
-        padding: 5, // Optional: Adjust padding
-        borderRadius: 50, // Circular background for better visibility
-    },
-    editButton: {
-        top: 5, // Aligns the edit button to the top of the post
-        right: 5, // Aligns the edit button to the right of the post
-    },
-    deleteButton: {
-        bottom: 5, // Aligns the delete button to the bottom of the post
-        right: 5, // Aligns the delete button to the right of the post
-    },
-    
 });
 
 export default FoodJournalScreen;
