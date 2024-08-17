@@ -63,6 +63,17 @@ const PostScreen = ({ route }) => {
             console.error('Error updating likes in Firestore:', error);
             // Optionally handle error, e.g., rollback the like count in UI
         }
+
+        try {
+            if (newFavoriteState) {
+              await writeWithIdToDB({timestamp:new Date(), post_id: item.id}, `User/${currentUserId}/FavoritePost`, post.id);
+            }
+            else {
+              await deleteWithIdFromDB(`User/${currentUserId}/FavoritePost`, post.id);
+            }
+          } catch (error) {
+            console.error('Error inserting likes to FavoritePosts in Firestore:', error);
+          }
     };
 
     // useEffect to fetch restaurant details based on place_id from the post data

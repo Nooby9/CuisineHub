@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, FlatList, Image, Pressable } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Pressable } from 'react-native';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../Firebase/firebaseSetup';
-import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
+import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper';
 
 const fetchPlaceDetails = async (place_id) => {
   try {
@@ -13,7 +13,7 @@ const fetchPlaceDetails = async (place_id) => {
       params: {
         place_id: place_id,
         key: googlePlacesApiKey,
-        fields: 'name,rating,opening_hours,formatted_address,photos',
+        fields: 'name,rating,opening_hours,formatted_address,photos,geometry,reviews',
       },
     });
     return response.data.result;
@@ -32,6 +32,7 @@ const RestaurantScreen = ({ route }) => {
   const place_id = route.params.place_id;
   const [restaurant, setRestaurant] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
@@ -45,8 +46,10 @@ const RestaurantScreen = ({ route }) => {
           );
           setPhotos(photoUrls);
         }
+        if (placeDetails.reviews) {
+          setReviews(placeDetails.reviews);
+        }
 
-        // Check if the restaurant is already a favorite
         const user = auth.currentUser;
         if (user) {
           const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, place_id);
@@ -69,13 +72,12 @@ const RestaurantScreen = ({ route }) => {
         rating: restaurant.rating,
         timestamp: new Date(),
         photo_reference: restaurant.photos[0].photo_reference,
+        location: restaurant.geometry.location
       };
 
       if (!isFavorite) {
-        // Adding to favorites
         await writeWithIdToDB(favoriteData, `User/${user.uid}/FavoriteRestaurant`, place_id);
       } else {
-        // Removing from favorites
         await deleteWithIdFromDB(`User/${user.uid}/FavoriteRestaurant`, place_id);
       }
     } else {
@@ -89,7 +91,7 @@ const RestaurantScreen = ({ route }) => {
         <Pressable 
           onPress={toggleFavorite} 
           style={styles.favoriteButton}
-          disabled={!restaurant} // Disable button if restaurant data is not yet available
+          disabled={!restaurant}
         >
           <Ionicons 
             name={isFavorite ? 'heart' : 'heart-outline'} 
@@ -100,18 +102,26 @@ const RestaurantScreen = ({ route }) => {
       ),
     });
   }, [navigation, isFavorite, restaurant]);
-  
 
   const renderImage = ({ item }) => (
     <Image source={{ uri: item }} style={styles.postImage} />
   );
 
-  if (!restaurant) {
-    return <Text>Loading...</Text>;
-  }
+  const renderReview = ({ item }) => (
+    <View style={styles.reviewContainer}>
+      <Image source={{ uri: item.profile_photo_url }} style={styles.reviewProfilePhoto} />
+      <View style={styles.reviewContent}>
+        <Text style={styles.reviewAuthor}>{item.author_name}</Text>
+        <Text style={styles.reviewRating}>Rating: {item.rating}</Text>
+        <Text style={styles.reviewText}>{item.text}</Text>
+        <Text style={styles.reviewTime}>{item.relative_time_description}</Text>
+      </View>
+    </View>
+  );
 
-  return (
-    <ScrollView style={styles.container}>
+  const renderContent = () => (
+    <>
+      {/* Photos */}
       <FlatList
         data={photos}
         renderItem={renderImage}
@@ -120,6 +130,8 @@ const RestaurantScreen = ({ route }) => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
       />
+      
+      {/* Restaurant Details */}
       <View style={styles.restaurantSection}>
         <View style={styles.restaurantDetail}>
           <Text style={styles.restaurantName}>{restaurant.name}</Text>
@@ -127,13 +139,35 @@ const RestaurantScreen = ({ route }) => {
         </View>
         <Text style={styles.restaurantType}>Hours: {restaurant.opening_hours?.open_now ? 'Open!' : 'Closed'}</Text>
       </View>
+      
+      {/* Location */}
       <View style={styles.locationSection}>
         <View style={styles.locationLeft}>
           <Text style={styles.locationTitle}>Location: </Text>
           <Text style={styles.location}>{restaurant.formatted_address || 'No address available'}</Text>
         </View>
       </View>
-    </ScrollView>
+
+      {/* Reviews */}
+      <FlatList
+        data={reviews}
+        renderItem={renderReview}
+        keyExtractor={(item, index) => index.toString()}
+        style={styles.reviewList}
+      />
+    </>
+  );
+
+  if (!restaurant) {
+    return <Text>Loading...</Text>;
+  }
+
+  return (
+    <FlatList
+      data={[{ key: 'content' }]} // Single item for rendering the entire content
+      renderItem={renderContent}
+      keyExtractor={(item) => item.key}
+    />
   );
 };
 
@@ -198,5 +232,37 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     marginRight: 15,
+  },
+  reviewList: {
+    padding: 15,
+  },
+  reviewContainer: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    borderRadius: 10,
+  },
+  reviewProfilePhoto: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  reviewContent: {
+    flex: 1,
+  },
+  reviewAuthor: {
+    fontWeight: 'bold',
+  },
+  reviewRating: {
+    color: '#777',
+  },
+  reviewText: {
+    marginVertical: 5,
+  },
+  reviewTime: {
+    fontSize: 12,
+    color: '#999',
   },
 });
