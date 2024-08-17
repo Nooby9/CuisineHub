@@ -5,7 +5,7 @@ import { subscribeToCollection } from '../Firebase/firestoreHelper';
 import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
 import { database } from '../Firebase/firebaseSetup';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
-import { useNavigation  } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../style';
 import * as Location from 'expo-location';
 
@@ -38,8 +38,8 @@ const DiscoverScreen = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const navigation = useNavigation();
 
-  function getPostDetailPress(post){
-    navigation.navigate('Post', { post});
+  function getPostDetailPress(post) {
+    navigation.navigate('Post', { post });
   }
 
   // Fetch the user's current location
@@ -68,12 +68,15 @@ const DiscoverScreen = () => {
         if (!querySnapshot.empty) {
           const promises = querySnapshot.docs.map(async (doc) => {
             const postData = doc.data();
+            let distance = 100
 
-            // Calculate distance from the current location to the post's location
-            const distance = haversineDistance(currentLocation, {
-              latitude: postData.location.latitude,
-              longitude: postData.location.longitude,
-            });
+            if (postData.location) {
+              // Calculate distance from the current location to the post's location
+              distance = haversineDistance(currentLocation, {
+                latitude: postData.location.latitude,
+                longitude: postData.location.longitude,
+              });
+            }
 
             // Filter out posts that restaurant is more than 40 km away
             if (distance <= 40) {
@@ -88,12 +91,15 @@ const DiscoverScreen = () => {
           });
 
           postsArray = (await Promise.all(promises)).filter(Boolean);
-          
+
           postsArray.sort((a, b) => {
             // If dates are equal, sort by like count (most liked first)
             const likesComparison = (b.likedBy?.length || 0) - (a.likedBy?.length || 0);
             if (likesComparison !== 0) return likesComparison;
-            // First, sort by date (most recent first)
+            // Sort by distance
+            const distanceComparison = a.distance - b.distance;
+            if (distanceComparison !== 0) return distanceComparison;
+            // Sort by date (most recent first)
             const dateComparison = new Date(b.date) - new Date(a.date);
             if (dateComparison !== 0) return dateComparison;
             // If likes are equal, sort by comment count (most comments first)
@@ -105,13 +111,13 @@ const DiscoverScreen = () => {
       }
     );
     return () => unsubscribe();
-  }, []);
+  }, [currentLocation]);
 
   return (
     <View style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={({ item }) => <PostItem item={item} onPress={getPostDetailPress}/>}
+        renderItem={({ item }) => <PostItem item={item} onPress={getPostDetailPress} />}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.columnWrapper}
