@@ -13,8 +13,8 @@ const SearchScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(true); // Add locationLoading state
   const [region, setRegion] = useState({
-    latitude: 37.4161493,
-    longitude: -122.0812166,
+    latitude: 49.2827,
+    longitude: -123.1207,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
@@ -58,7 +58,7 @@ const SearchScreen = ({ navigation }) => {
 
     try {
       const response = await axios.request(options);
-      console.log('Response:', response.data.results);
+      //console.log('Response:', response.data.results);
       setRestaurants(response.data.results);
       updateMapRegion(response.data.results);
     } catch (error) {

@@ -1,5 +1,5 @@
 # CuisineHub
-
+# PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO ASK FOR YOUR CURRENT LOCATION CORRECTLY!
 ## 1. Overview
 
 **Cuisine Hub** is your ultimate guide to discovering and reviewing the best restaurants around you! Whether you're a casual diner or a gourmet enthusiast, Cuisine Hub makes it easy to find new dining spots, share your experiences, and read honest reviews from fellow food lovers. Turn every meal into an adventure with Cuisine Hub.
