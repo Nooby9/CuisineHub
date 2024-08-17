@@ -41,6 +41,12 @@ const PostEditorScreen = ({ navigation, route }) => {
                     setContent(post.comment);
                     setPlaceId(post.place_id);
                     setSearchQuery(post.placeDetails ? post.placeDetails.name : '');
+                    
+                    // Prefill location if available
+                    if (post.location) {
+                        setLocation(post.location);
+                    }
+
 
                     // Add delete button to the header
                     navigation.setOptions({

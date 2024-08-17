@@ -87,7 +87,7 @@ const PostScreen = ({ route }) => {
         };
         fetchData();
     }, [post.place_id]);
-    console.log("Fetched Place Details:", restaurant);
+
     // useEffect to fetch image URLs from Firebase Storage
     useEffect(() => {
         const fetchImages = async () => {
