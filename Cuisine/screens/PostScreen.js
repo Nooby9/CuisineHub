@@ -87,7 +87,7 @@ const PostScreen = ({ route }) => {
         };
         fetchData();
     }, [post.place_id]);
-
+    console.log("Fetched Place Details:", restaurant);
     // useEffect to fetch image URLs from Firebase Storage
     useEffect(() => {
         const fetchImages = async () => {
@@ -259,7 +259,6 @@ const PostScreen = ({ route }) => {
                         </PressableButton>
                     </View>
                 </Pressable>
-
                     <Text style={styles.restaurantRating}>{restaurant.rating} stars</Text>
                     <Text style={styles.restaurantAddress}>{restaurant.formatted_address}</Text>
                 </View>
