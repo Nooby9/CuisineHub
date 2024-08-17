@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
@@ -14,6 +14,7 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  // Watch for authentication state change
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -23,16 +24,18 @@ const ProfileScreen = () => {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      const fetchUserInfo = async () => {
-        console.log(user.uid);
-        const userData = await getUserInfoDB(user.uid);
-        setUserInfo(userData);
-      };
-      fetchUserInfo();
-    }
-  }, [user]);
+  // Fetch user info from the database whenever the screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        const fetchUserInfo = async () => {
+          const userData = await getUserInfoDB(user.uid);
+          setUserInfo(userData);
+        };
+        fetchUserInfo();
+      }
+    }, [user])
+  );
 
   const handleNewPost = () => {
     navigation.navigate('New Post');
@@ -92,13 +95,13 @@ const ProfileScreen = () => {
         <Text style={styles.actionText}>Notifications</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.signoutButton} onPress={()=>{
-          try{
-            signOut(auth);
-          } catch (error) {
-            console.log("Error signing out: ", error);
-          }
-        }}>
+      <TouchableOpacity style={styles.signoutButton} onPress={() => {
+        try {
+          signOut(auth);
+        } catch (error) {
+          console.log("Error signing out: ", error);
+        }
+      }}>
         <Text style={styles.signoutText}>Sign Out</Text>
       </TouchableOpacity>
     </View>

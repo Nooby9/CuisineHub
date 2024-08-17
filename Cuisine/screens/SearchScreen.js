@@ -146,7 +146,7 @@ const SearchScreen = ({ navigation }) => {
           data={restaurants}
           keyExtractor={(item) => item.place_id.toString()}
           renderItem={renderRestaurant}
-          ListEmptyComponent={<Text>No restaurants found</Text>}
+          ListEmptyComponent={<Text>Please Search the Restaurant in the Search Bar</Text>}
         />
       )}
     </View>
