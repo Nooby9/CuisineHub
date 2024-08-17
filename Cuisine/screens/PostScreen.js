@@ -1,8 +1,8 @@
 // PostScreen.js
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, FlatList, TextInput, Alert } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import { getUserName, updateDB } from '../Firebase/firestoreHelper';
@@ -77,27 +77,30 @@ const PostScreen = ({ route }) => {
     };
 
     // useEffect to fetch restaurant details based on place_id from the post data
-    useEffect(() => {
-        const fetchData = async () => {
+    useFocusEffect(
+        useCallback(() => {
+          const fetchData = async () => {
             try {
-                if (post.place_id) {
-                    const placeDetails = await fetchPlaceDetails(post.place_id);
-                    setRestaurant(placeDetails);
-                    if (placeDetails) {
-                        // Check if the restaurant is already a favorite
-                        const user = auth.currentUser;
-                        if (user) {
-                            const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
-                            setIsRestaurantFavorite(exists);
-                        }
-                    }
+              if (post.place_id) {
+                const placeDetails = await fetchPlaceDetails(post.place_id);
+                setRestaurant(placeDetails);
+                if (placeDetails) {
+                  // Check if the restaurant is already a favorite
+                  const user = auth.currentUser;
+                  if (user) {
+                    const exists = await checkIfDocExists(`User/${user.uid}/FavoriteRestaurant`, post.place_id);
+                    setIsRestaurantFavorite(exists);
+                  }
                 }
+              }
             } catch (error) {
-                console.error('Error fetching place details:', error);
+              console.error('Error fetching place details:', error);
             }
-        };
-        fetchData();
-    }, [post.place_id]);
+          };
+    
+          fetchData();
+        }, [post.place_id])
+      );
 
     // useEffect to fetch image URLs from Firebase Storage
     useEffect(() => {
