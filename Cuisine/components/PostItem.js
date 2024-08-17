@@ -123,12 +123,12 @@ const PostItem = ({ item, onPress }) => {
 const styles = StyleSheet.create({
   card: {
     width: '48%',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     marginBottom: 10,
     borderRadius: 10,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: colors.itemBorder,
     flexDirection: 'column', // Arrange children vertically
     justifyContent: 'space-between', // Distribute space to move footer to bottom
   },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     padding: 10,
     fontSize: 14,
-    color: '#333',
+    color: colors.textDark,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   cardAuthor: {
     fontSize: 12,
-    color: '#777',
+    color: colors.textLight,
   },
 });
 

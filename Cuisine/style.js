@@ -2,25 +2,29 @@ import { StyleSheet } from 'react-native';
 
 // Define colors for the app
 export const colors = {
-    primary: '#6200EE',
-    secondary: '#03DAC6',
-    backgroundLight: '#D8BFD8',
-    backgroundDark: 'mediumpurple',
-    textLight: '#4B0082',
-    textDark: '#FFFFFF',
+    background: '#fff',
+    currentLocation: 'blue',
+    textDark: '#333',
+    textLight: '#777',
     orchidBG: 'mediumorchid',
     headerText: '#FFFFFF',
     rippleEffect: 'darkseagreen',
     alertIcon: '#FFD700',
-    leftButton: "#8B0000",
-    rightButton: "#4B0082",
-    itemBackground: '#4B0082',
-    itemText: '#4B0082',
-    itemTextBG: '#FFFFFF',
-    inputBorder: '#4B0082',
-    checkedCheckbox: '#4630EB',
+    border: '#ccc',
+    borderBottom: '#eee',
+    postButtonBg: '#ff3b30',
+    pressedButton: '#aaa',
+    white: '#ffffff',
     favorite: 'hotpink',
-    notFavorite: '#AAA'
+    notFavorite: '#AAA',
+    restaurantSecBg: 'lemonchiffon',
+    commentText:'#888',
+    likeBg: 'paleturquoise',
+    addCommentButton: '#4CAF50',
+    loadingBg:'rgba(255, 255, 255, 0.7)',
+    dividerBg: 'rgba(204, 204, 204, 0.3)',
+    deleteButtonBg: 'rgba(0, 0, 0, 0.5)',
+    itemBorder:'#eee',
 };
 // Define common styles used across the app
 export const commonStyles = StyleSheet.create({

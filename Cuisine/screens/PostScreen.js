@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { colors, commonStyles } from '../style';
 import { getUserName, updateDB } from '../Firebase/firestoreHelper';
-import { ref, getDownloadURL } from 'firebase/storage';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { fetchImageUrls, fetchPlaceDetails } from '../utils/CommonMethod';
 import { writeWithIdToDB, deleteWithIdFromDB, checkIfDocExists } from '../Firebase/firestoreHelper'; // Import the helper functions
@@ -15,6 +14,7 @@ import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
 import { arrayUnion } from 'firebase/firestore';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 
 // Define collection name
@@ -232,7 +232,11 @@ const PostScreen = ({ route }) => {
       };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={80} // Adjust this value based on your header height or needs
+        >
             <ScrollView style={styles.container}>
                 <FlatList
                     data={imageUrls}
@@ -266,7 +270,6 @@ const PostScreen = ({ route }) => {
                         </PressableButton>
                     </View>
                 </Pressable>
-
                     <Text style={styles.restaurantRating}>{restaurant.rating} stars</Text>
                     <Text style={styles.restaurantAddress}>{restaurant.formatted_address}</Text>
                 </View>
@@ -327,14 +330,14 @@ const PostScreen = ({ route }) => {
                     </View>
                 </Pressable>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     postImage: {
         width: 300,
@@ -347,14 +350,14 @@ const styles = StyleSheet.create({
     },
     comment: {
         fontSize: 16,
-        color: '#333',
+        color: colors.textDark,
     },
     restaurantSection: {
         padding: 15,
-        borderColor: 'white',
+        borderColor: colors.white,
         borderWidth: 8,
         borderRadius: 15,
-        backgroundColor: 'lemonchiffon',
+        backgroundColor: colors.restaurantSecBg,
     },
     restaurantInfo: {
         flexDirection: 'row',
@@ -370,35 +373,35 @@ const styles = StyleSheet.create({
     restaurantName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.textDark,
     },
     restaurantRating: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     restaurantAddress: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     date: {
         fontSize: 13,
-        color: '#777',
+        color: colors.textLight,
         alignItems: 'center',
         marginHorizontal: 15
     },
     location: {
         fontSize: 14,
-        color: '#777',
+        color: colors.textLight,
     },
     titleSection: {
         padding: 10,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
-    
+
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: colors.textDark,
         textAlign: 'center',
         textAlign: 'left',
     },
@@ -423,19 +426,19 @@ const styles = StyleSheet.create({
     },
     commentDate: {
         fontSize: 12,
-        color: '#888',
+        color: colors.commentText,
         marginBottom: 5,
     },
     divider: {
         height: 1,
-        backgroundColor: 'rgba(204, 204, 204, 0.3)',
+        backgroundColor: colors.dividerBg,
         marginVertical: 5,
     },
     fab: {
         position: 'absolute',
         bottom: 20,
         right: 20,
-        backgroundColor: 'paleturquoise',
+        backgroundColor: colors.likeBg,
         borderRadius: 50,
         width: 60, // Adjust the width to ensure it remains circular
         height: 60, // Ensure the height is the same as the width for circular shape
@@ -449,7 +452,7 @@ const styles = StyleSheet.create({
     },
     likesCount: {
         fontSize: 12,
-        color: '#777',
+        color: colors.textLight,
         marginTop: 2, // Small margin between the icon and the text
     },
 
@@ -461,20 +464,20 @@ const styles = StyleSheet.create({
     commentInput: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: colors.border,
         borderRadius: 20,
         padding: 10,
         marginRight: 10,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     addCommentButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: colors.addCommentButton,
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderRadius: 20,
     },
     addCommentButtonText: {
-        color: '#fff',
+        color: colors.background,
         fontWeight: 'bold',
     },
 

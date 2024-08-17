@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker'; // Import image picker from Ex
 import { MaterialIcons } from '@expo/vector-icons'; // Import icons for UI
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../Firebase/firebaseSetup'; // Adjust the path as needed
+import { colors } from '../style';
 
 const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage, isEditMode = false }) => {
   const [selectedImages, setSelectedImages] = useState([]); // State to store the selected image URIs
@@ -12,13 +13,21 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
     setSelectedImages(initialImages);
   }, [initialImages]);
 
-  // Function to request camera and media library permissions
-  const requestPermissions = async () => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  // Function to request camera permissions
+  const requestCameraPermissions = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Camera Permission Required', 'Please grant camera permission to use this feature.');
+      return false;
+    }
+    return true;
+  };
 
-    if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
-      Alert.alert('Permissions Required', 'Please grant camera and media library permissions to use this feature.');
+  // Function to request media library permissions
+  const requestMediaLibraryPermissions = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Media Library Permission Required', 'Please grant media library permission to use this feature.');
       return false;
     }
     return true;
@@ -26,7 +35,7 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
 
   // Function to pick multiple images from the gallery
   const pickImages = async () => {
-    const hasPermission = await requestPermissions(); // Check for permissions
+    const hasPermission = await requestMediaLibraryPermissions(); // Check for permissions
     if (!hasPermission) return;
 
     if (selectedImages.length >= 9) {
@@ -56,7 +65,7 @@ const ImagePickerComponent = ({ initialImages = [], onImageSelect, onRemoveImage
 
   // Function to take a photo using the camera
   const takePhoto = async () => {
-    const hasPermission = await requestPermissions(); // Check for permissions
+    const hasPermission = await requestCameraPermissions(); // Check for permissions
     if (!hasPermission) return;
 
     if (selectedImages.length >= 9) {
@@ -164,7 +173,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background for visibility
+    backgroundColor: colors.deleteButtonBg, // Semi-transparent background for visibility
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -175,7 +184,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
