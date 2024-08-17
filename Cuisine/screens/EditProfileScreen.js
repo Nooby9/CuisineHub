@@ -55,6 +55,7 @@ const EditProfileScreen = ({navigation}) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.headerText}>Edit Profile</Text>
 
+        <Text style={styles.text}>Username</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -65,6 +66,7 @@ const EditProfileScreen = ({navigation}) => {
         />
       </View>
 
+        <Text style={styles.text}>Bio</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -76,6 +78,7 @@ const EditProfileScreen = ({navigation}) => {
         />
       </View>
 
+        <Text style={styles.text}>Phone Number</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -147,6 +150,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  text: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 10,
+  }
 });
 
 export default EditProfileScreen;
