@@ -230,24 +230,21 @@ npx expo start --tunnel
    - Modified the system to store the author of posts and comments as UIDs instead of usernames.
    - On display, the system retrieves the latest username from Firestore based on the UID, ensuring that any changes to the username are correctly reflected across the application.
 
-
 #### Shurui Xu
 
 1. **User From Firebase Auth in Firebase Storage**:
 
-- When a new user registers, they will be automatically added to firebase storage using the Firebase Auth id. 
+- When a new user registers, they will be automatically added to firebase storage using the Firebase Auth id.
 
 2. **User FavoriteRestaurant Subcollection**:
 
    - When a user likes/favorites a restaurant, the restaurant will be added to a subcollection in user.
-   - When a user unfavorites a restaurant, the restaurant will be removed from that subcollection. 
-
+   - When a user unfavorites a restaurant, the restaurant will be removed from that subcollection.
 3. **Login Page**:
 
    - Users can login through their email and password if they have registered before
    - User can click on forgot password to send a reset password email to their email
    - User can switch to signup page if them have not registered yet
-  
 
      ![login page](image/README/login_page.png)
 4. **Singup Page**:
@@ -260,8 +257,28 @@ npx expo start --tunnel
 
      ![signup page](image/README/register_user_page.png)
 5. **Favorites Page**:
+
    - The Favorites Page displays a list of favorite restaurants that the user has marked
    - The User can click on a restaurant and unfavorite them
    - Favorite button is synchornized and fetched dynamically, meaning that the favorite state is feteched from the database and displayed depending on whether the restaurant exists in the FavoriteRestaurant subcollection
-   ![favorites page](image/README/favorites_page.png)
-   ![restaurant details with favorite page](image/README/restaurant_detail_with_favorite_page.png)
+     ![favorites page](image/README/favorites_page.png)
+     ![restaurant details with favorite page](image/README/restaurant_detail_with_favorite_page.png)
+
+### 6.3 Iteration 3
+
+#### Huijia Wang
+
+1. Ensuring that the text input is not obscured when adding comments, improving user experience during text entry.
+
+   ![1723771721174](image/README/1723771721174.png)
+2. Filtering posts by user ID (UID) in the Food Journal, so only posts published by the user are displayed for editing.
+3. Implementing Firestore rules for posts to enhance data security and access control.
+
+   ![1723771206640](image/README/1723771206640.png)
+4. Adding a current location marker to the map in the Food Journal, improving user experience by showing their position.
+
+   ![1723771814029](image/README/1723771814029.png)
+5. Using a centralized `Style.js` file to manage common colors for the components I developed, ensuring consistent design across the application.
+6. Implementing sorting logic in the DiscoverScreen and Food Journal posts, applying a weighted order to make the post display more meaningful and relevant.
+7. Implemented the functionality to save the geographical information of the restaurant when creating or modifying a post.
+8. Updated the Discover screen to filter and display posts only from restaurants within a 40 km radius of the current location. Additionally, the distance from the current location is now one of the parameters used to sort the posts.
