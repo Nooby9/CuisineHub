@@ -13,6 +13,12 @@ const COLLECTION_NAME = FIREBASE_COLLECTIONS.POSTS;
 
 // Helper function to calculate the distance between two coordinates in kilometers
 const haversineDistance = (coords1, coords2) => {
+  // Check if either of the coordinates is null or undefined
+  if (!coords1 || !coords2 || !coords1.latitude || !coords1.longitude || !coords2.latitude || !coords2.longitude) {
+    console.error('Invalid coordinates provided:', coords1, coords2);
+    return null; // or return a default value, e.g., 0 or -1, depending on your use case
+  }
+
   const toRad = (x) => (x * Math.PI) / 180;
 
   const lat1 = coords1.latitude;
@@ -36,6 +42,7 @@ const haversineDistance = (coords1, coords2) => {
 const DiscoverScreen = () => {
   const [posts, setPosts] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   function getPostDetailPress(post) {
@@ -48,6 +55,7 @@ const DiscoverScreen = () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission to access location was denied');
+        setLoading(false);
         return;
       }
 
@@ -60,6 +68,10 @@ const DiscoverScreen = () => {
   }, []);
 
   useEffect(() => {
+    if (!currentLocation) {
+      return; // If the current location is not available, do not proceed.
+    }
+
     const unsubscribe = onSnapshot(
       collection(database, COLLECTION_NAME),
       async (querySnapshot) => {
@@ -108,6 +120,7 @@ const DiscoverScreen = () => {
         }
 
         setPosts(postsArray);
+        setLoading(false); // Stop loading when posts are fetched
       }
     );
     return () => unsubscribe();
@@ -115,6 +128,11 @@ const DiscoverScreen = () => {
 
   return (
     <View style={styles.container}>
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
       <FlatList
         data={posts}
         renderItem={({ item }) => <PostItem item={item} onPress={getPostDetailPress} />}
@@ -123,6 +141,7 @@ const DiscoverScreen = () => {
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.contentContainer}
       />
+      )}
     </View>
   );
 };
