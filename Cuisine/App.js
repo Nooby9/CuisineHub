@@ -20,6 +20,7 @@ import { auth } from './Firebase/firebaseSetup';
 import { useEffect, useState } from 'react';
 import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
 import EditProfileScreen from './screens/EditProfileScreen';
+import NotificationScreen from './screens/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -70,6 +71,7 @@ const AppStack = (
     <Stack.Screen name="Personal Food Journal" component={FoodJournalScreen} />
     <Stack.Screen name="Favorites" component={FavoritesTabNavigator} />
     <Stack.Screen name="Edit Profile" component={EditProfileScreen} />
+    <Stack.Screen name="Notifications" component={NotificationScreen} />
   </>
 );
 
