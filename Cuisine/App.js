@@ -20,10 +20,15 @@ import { auth } from './Firebase/firebaseSetup';
 import { useEffect, useState } from 'react';
 import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
 import EditProfileScreen from './screens/EditProfileScreen';
-import NotificationScreen from './screens/NotificationScreen';
+import * as Notifications from 'expo-notifications';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+Notifications.setNotificationHandler({
+	handleNotification: async () => { }
+});
+
 
 function Tabs() {
   return (
@@ -71,7 +76,6 @@ const AppStack = (
     <Stack.Screen name="Personal Food Journal" component={FoodJournalScreen} />
     <Stack.Screen name="Favorites" component={FavoritesTabNavigator} />
     <Stack.Screen name="Edit Profile" component={EditProfileScreen} />
-    <Stack.Screen name="Notifications" component={NotificationScreen} />
   </>
 );
 
@@ -83,6 +87,23 @@ export default function App() {
       setIsUserAuthenticated(!!user);
     });
   }, []);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log("Notification Received: ", notification);
+    });
+    return () => subscription.remove();
+  }
+  , [])
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const url = response.notification.request.content.data.url;
+      Linking.openURL(url);
+    });
+    return () => subscription.remove();
+  }
+  , [])
 
   return (
     <NavigationContainer>

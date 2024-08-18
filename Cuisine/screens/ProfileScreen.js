@@ -50,10 +50,6 @@ const ProfileScreen = () => {
     navigation.navigate('Favorites');
   };
 
-  const handleNotifications = () => {
-    navigation.navigate('Notifications');
-  };
-
   const handleEditProfile = () => {
     navigation.navigate('Edit Profile');
   };
@@ -91,10 +87,6 @@ const ProfileScreen = () => {
 
       <TouchableOpacity style={styles.actionButton} onPress={handleFavorites}>
         <Text style={styles.actionText}>Favorites</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.actionButton} onPress={handleNotifications}>
-        <Text style={styles.actionText}>Notifications</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.signoutButton} onPress={() => {
