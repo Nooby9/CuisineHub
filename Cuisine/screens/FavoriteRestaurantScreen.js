@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, Button } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
 import { googlePlacesApiKey } from '@env';
-import * as Location from 'expo-location'; // Importing Location to get current user location
+import * as Location from 'expo-location';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const FavoriteRestaurantScreen = ({ navigation }) => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
@@ -12,30 +14,40 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [sortBy, setSortBy] = useState('time'); // 'time' or 'distance'
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const favorites = await getFavoriteRestaurants(user.uid);
-        setFavoriteRestaurants(favorites);
-        setSortedRestaurants(favorites);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchFavorites = async () => {
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            const favorites = await getFavoriteRestaurants(user.uid);
+            setFavoriteRestaurants(favorites);
+            setSortedRestaurants(favorites);
+          } catch (error) {
+            console.error('Error fetching favorite restaurants:', error);
+          }
+        }
+      };
 
-    const getCurrentLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        return;
-      }
+      const getCurrentLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Permission to access location was denied');
+          return;
+        }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
-    };
+        try {
+          let location = await Location.getCurrentPositionAsync({});
+          setCurrentLocation(location.coords);
+        } catch (error) {
+          console.error('Error getting location:', error);
+        }
+      };
 
-    fetchFavorites();
-    getCurrentLocation();
-  }, []);
+      fetchFavorites();
+      getCurrentLocation();
+    }, []) // Empty dependency array means this runs on every screen focus
+  );
 
   useEffect(() => {
     sortRestaurants(sortBy);

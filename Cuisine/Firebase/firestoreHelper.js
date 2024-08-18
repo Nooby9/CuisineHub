@@ -199,6 +199,17 @@ export async function getFavoritePosts(userId) {
   }
 }
 
+export const updateUserInfo = async (userId, updatedInfo) => {
+  try {
+    const userRef = doc(database, 'User', userId);
+    await updateDoc(userRef, updatedInfo); // Merge the updated fields into the user's document
+    console.log('User info updated successfully');
+  } catch (error) {
+    console.error('Error updating user info:', error);
+    throw error;
+  }
+};
+
 
 
 
