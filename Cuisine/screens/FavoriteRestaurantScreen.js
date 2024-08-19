@@ -1,18 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, Button } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Alert, Pressable, Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useFocusEffect } from '@react-navigation/native';
+import * as Location from 'expo-location';
 import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
 import { googlePlacesApiKey } from '@env';
-import * as Location from 'expo-location';
-import { useFocusEffect } from '@react-navigation/native';
-
+import { verifyPermission } from '../components/NotificationManager';
+import PressableButton from '../components/PressableButton';
 
 const FavoriteRestaurantScreen = ({ navigation }) => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
   const [sortedRestaurants, setSortedRestaurants] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [sortBy, setSortBy] = useState('time'); // 'time' or 'distance'
+  const [sortBy, setSortBy] = useState('time');
+  const [date, setDate] = useState(new Date());
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false); 
+  const [tempSelectedDate, setTempSelectedDate] = useState(new Date()); // Temporary selected date before confirmation
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [combinedDateTime, setCombinedDateTime] = useState(null);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -46,7 +55,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
 
       fetchFavorites();
       getCurrentLocation();
-    }, []) // Empty dependency array means this runs on every screen focus
+    }, [])
   );
 
   useEffect(() => {
@@ -90,6 +99,101 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
     navigation.navigate('Restaurant', { place_id: restaurant.place_id });
   };
 
+  const onDateChange = (event, selectedDate) => {
+    if (event.type === 'set') {
+      const currentDate = new Date();
+      if (selectedDate > currentDate) {
+        setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
+      } else {
+        Alert.alert('Invalid Date', 'Please select a future date and time.');
+      }
+    }
+  };
+
+  const onAndroidDateChange = (event, selectedDate) => {
+    if (event.type === 'set') {
+      console.log('Selected Date:', selectedDate);
+      setShowDateTimePicker(false); // Hide the picker after selecting a date
+      setTempSelectedDate(selectedDate); // Temporarily store the selected date
+      setShowTimePicker(true);
+    }
+  };
+  
+
+  const onAndroidTimeChange = (event, selectedTime) => {
+    if (event.type === 'set') {
+      setShowTimePicker(false); // Hide the picker after selecting a time
+      const currentDate = new Date();
+      console.log('Temp Selected Date:', tempSelectedDate);
+      if (tempSelectedDate) {
+        const combined = new Date(tempSelectedDate);
+        combined.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
+        if (combined > currentDate) {
+          setCombinedDateTime(combined); // Update the combined date and time
+          confirmDateAndroid(combined); // Confirm the date and time
+          console.log('Combined Date:', combined);
+        } else {
+          Alert.alert('Invalid Time', 'Please select a future time.');
+        }
+      }
+    }
+  };
+  
+
+  const confirmDate = async () => {
+    const currentDate = new Date();
+    if (tempSelectedDate <= currentDate) {
+      Alert.alert('Invalid Date', 'Please select a future date and time.');
+      return;
+    }
+
+    const hasPermission = await verifyPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Restaurant Reminder",
+        body: `Don't forget to visit ${selectedRestaurant.name}!`,
+        data: { restaurantId: selectedRestaurant.place_id }
+      },
+      trigger: {
+        date: tempSelectedDate, // Use the temporary date
+      },
+    });
+
+    setShowDateTimePicker(false); // Hide the picker only after confirmation
+    Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${tempSelectedDate}`);
+  };
+
+  const confirmDateAndroid = async (date) => {
+    const currentDate = new Date();
+    if (!date || date <= currentDate) {
+      Alert.alert('Invalid Date', 'Please select a future date and time.');
+      return;
+    }
+
+    const hasPermission = await verifyPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Restaurant Reminder",
+        body: `Don't forget to visit ${selectedRestaurant.name}!`,
+        data: { restaurantId: selectedRestaurant.place_id }
+      },
+      trigger: {
+        date: date, // Use the combined date and time
+      },
+    });
+
+    setShowDateTimePicker(false); // Hide the picker after confirmation
+    Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${date}`);
+  };
+
   const renderRestaurant = ({ item }) => (
     <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
       {item.photo_reference && (
@@ -101,6 +205,15 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       <Text style={styles.restaurantName}>{item.name}</Text>
       <Text style={styles.restaurantAddress}>{item.address}</Text>
       <Text>Rating: {item.rating} stars</Text>
+      <Pressable style={styles.reminderButton}
+        onPress={() => {
+          setSelectedRestaurant(item);
+          setShowDateTimePicker(true); 
+          setTempSelectedDate(new Date());
+        }}
+      >
+        <Text style={styles.reminderButtonText}>Set Reminder</Text>
+      </Pressable>
     </TouchableOpacity>
   );
 
@@ -130,11 +243,56 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
           renderItem={renderRestaurant}
         />
       )}
+
+      {/* Conditional rendering for DateTimePicker */}
+      {Platform.OS === 'ios' && showDateTimePicker && (
+        <View style={styles.pickerOverlay}>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.modalTitle}>Select Reminder Time</Text>
+            <DateTimePicker
+              value={tempSelectedDate}
+              mode="datetime"
+              onChange={onDateChange}
+            />
+            <Button title="Confirm" onPress={confirmDate} />
+            <Button title="Close" onPress={() => setShowDateTimePicker(false)} />
+            
+          </View>
+        </View>
+      )}
+
+
+      {Platform.OS === 'android' && showTimePicker && ( 
+        <DateTimePicker
+          value={tempSelectedDate}
+          mode="time"
+          is24Hour={true}
+          display="default"
+          onChange={onAndroidTimeChange}
+          
+        />
+      )}
+      {Platform.OS === 'android' && showDateTimePicker && (
+        <DateTimePicker
+          value={tempSelectedDate}
+          mode="date"
+          is24Hour={true}
+          display="default"
+          onChange={onAndroidDateChange}
+        />
+      )}
+
+      
+
+      
+
+      
+
+
+
     </View>
   );
 };
-
-export default FavoriteRestaurantScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -186,4 +344,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  pickerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pickerContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  reminderButton: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  reminderButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 });
+
+export default FavoriteRestaurantScreen;

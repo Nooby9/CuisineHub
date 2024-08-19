@@ -20,9 +20,30 @@ import { auth } from './Firebase/firebaseSetup';
 import { useEffect, useState } from 'react';
 import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
 import EditProfileScreen from './screens/EditProfileScreen';
+import * as Notifications from 'expo-notifications';
+import { useNavigationContainerRef } from '@react-navigation/native';
+import WelcomeScreen from './screens/WelcomeScreen';
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+Notifications.setNotificationHandler({ // The parameter is an object of functions
+	handleNotification: async () => { // We are returning a promise here
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+    },
+    handleSuccess: async () => {
+      console.log("Notification was shown successfully");
+    },
+    handleError: async () => {
+      console.log("Error showing notification");
+    }
+  });
+
 
 function Tabs() {
   return (
@@ -54,7 +75,8 @@ function Tabs() {
 }
 
 const AuthStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome" >
+    <Stack.Screen name="Welcome" component={WelcomeScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Signup" component={SignupScreen} />
   </Stack.Navigator>
@@ -75,6 +97,7 @@ const AppStack = (
 
 export default function App() {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const navigationRef = useNavigationContainerRef();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -82,8 +105,30 @@ export default function App() {
     });
   }, []);
 
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log("Notification Received: ", notification);
+    });
+    return () => subscription.remove();
+  }
+  , [])
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const place_id = response.notification.request.content.data.restaurantId;
+      if (place_id && navigationRef.isReady()) {
+        navigationRef.navigate('Restaurant', { place_id });
+      }
+      else {
+        console.error('Navigation not ready or place_id not available:', place_id, navigationRef.isReady());
+      }
+    });
+    return () => subscription.remove();
+  }
+  , [])
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {isUserAuthenticated ? (
           AppStack

@@ -6,15 +6,15 @@ import { colors } from '../style';
 import { ref, uploadBytesResumable, deleteObject } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 
-
 const EditProfileScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
-  const [imageUri, setImageUri] = useState(null); // Store the selected or captured image URI
+  const [imageUri, setImageUri] = useState(null);
   const [response, requestPermission] = ImagePicker.useCameraPermissions();
+  const [phoneError, setPhoneError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,7 +24,7 @@ const EditProfileScreen = ({ navigation }) => {
           setUsername(userData.username || '');
           setBio(userData.bio || '');
           setPhone(userData.phone || '');
-          setImage(userData.profileImage || null); // Assume there's a profileImage field in Firestore
+          setImage(userData.profileImage || null);
         }
         setLoading(false);
       } catch (error) {
@@ -36,25 +36,35 @@ const EditProfileScreen = ({ navigation }) => {
   }, []);
 
   const handleSave = async () => {
-    const updatedInfo = {
-      username,
-      bio,
-      phone,
-      profileImage: imageUri || image, // Update with the new image if selected
-    };
+    if (validatePhoneNumber(phone)) {
+      const updatedInfo = {
+        username,
+        bio,
+        phone,
+        profileImage: imageUri || image,
+      };
 
-    try {
-      await updateUserInfo(auth.currentUser.uid, updatedInfo);
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('There was a problem updating your profile. Please try again!', error.message);
+      try {
+        await updateUserInfo(auth.currentUser.uid, updatedInfo);
+        navigation.goBack();
+      } catch (error) {
+        Alert.alert('There was a problem updating your profile. Please try again!', error.message);
+      }
+    } else {
+      Alert.alert('Invalid Phone Number', 'Please enter a valid phone number that is 10 digits.');
     }
+  };
+
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^\d{10}$/; // Adjust this to fit your phone number format
+    const isValid = phoneRegex.test(phone);
+    setPhoneError(!isValid ? 'Please enter a valid phone number that is 10 digits' : null);
+    return isValid;
   };
 
   async function deleteImageFromStorage(imageUrl) {
     try {
       const imageRef = ref(storage, imageUrl);
-      console.log('Delete image from storage:', imageUrl);
       await deleteObject(imageRef);
     } catch (error) {
       console.error('Error deleting image:', error);
@@ -63,11 +73,7 @@ const EditProfileScreen = ({ navigation }) => {
 
   async function uploadImageToStorage(imageUri) {
     try {
-        console.log("Selected Image URI:", imageUri);
       const response = await fetch(imageUri);
-      if (!response.ok) {
-        throw new Error('The fetch image request was not successful');
-      }
       const blob = await response.blob();
       const imageName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
       const imageRef = ref(storage, `profile_images/${imageName}`);
@@ -90,59 +96,49 @@ const EditProfileScreen = ({ navigation }) => {
   };
 
   const pickImageFromGallery = async () => {
-    try {
-        const hasPermission = await requestMediaLibraryPermissions();
-        if (!hasPermission) {
-            Alert.alert('Permission required', 'You need to grant permission to access the camera roll.');
-            return;
-        }
+    const hasPermission = await requestMediaLibraryPermissions();
+    if (!hasPermission) {
+      Alert.alert('Permission required', 'You need to grant permission to access the camera roll.');
+      return;
     }
-    catch (error) {
-        console.error('Error requesting media library permissions:', error);
-        return;
-    }
-    
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
 
-    //console.log('Image Picker Result:', result.assets[0].uri);
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri); // Set the selected image URI
+      setImageUri(result.assets[0].uri);
       const uploadedImagePath = await uploadImageToStorage(result.assets[0].uri);
-      setImage(uploadedImagePath); // Update the image path in Firestore
+      setImage(uploadedImagePath);
     }
   };
 
   async function verifyPermissions() {
     if (response.granted) {
-        return true;
-    } 
-     const permissionResponse = await requestPermission();
-     return permissionResponse.granted;
+      return true;
+    }
+    const permissionResponse = await requestPermission();
+    return permissionResponse.granted;
   }
 
   const takePhotoWithCamera = async () => {
-    try {
-        const haspermission = await verifyPermissions();
-        if (!haspermission) {
-            Alert.alert("You need to give permission to launch the camera")
-            return;
-        }
-        const result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            quality: 1,
-        });
+    const hasPermission = await verifyPermissions();
+    if (!hasPermission) {
+      Alert.alert("You need to give permission to launch the camera");
+      return;
+    }
 
-        if (!result.canceled) {
-        setImageUri(result.assets[0].uri); // Set the captured image URI
-        const uploadedImagePath = await uploadImageToStorage(result.assets[0].uri);
-        setImage(uploadedImagePath); // Update the image path in Firestore
-        }
-    } catch (error) {
-        console.error('Error taking photo with camera:', error);
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      const uploadedImagePath = await uploadImageToStorage(result.assets[0].uri);
+      setImage(uploadedImagePath);
     }
   };
 
@@ -157,7 +153,6 @@ const EditProfileScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.headerText}>Edit Profile</Text>
-      {/* Display the selected or captured image */}
       {imageUri ? (
         <Image source={{ uri: imageUri }} style={styles.profileImage} />
       ) : image ? (
@@ -166,12 +161,10 @@ const EditProfileScreen = ({ navigation }) => {
         <Text style={styles.text}>No profile image selected</Text>
       )}
 
-      {/* Button to pick image from gallery */}
       <TouchableOpacity style={styles.imageButton} onPress={pickImageFromGallery}>
         <Text style={styles.imageButtonText}>Select Image from Gallery</Text>
       </TouchableOpacity>
 
-      {/* Button to take a photo with the camera */}
       <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
         <Text style={styles.imageButtonText}>Take Photo</Text>
       </TouchableOpacity>
@@ -195,23 +188,22 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={setBio}
           placeholder="Bio"
           placeholderTextColor="#999"
-          multiline
         />
       </View>
 
       <Text style={styles.text}>Phone Number</Text>
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, phoneError ? styles.errorBorder : null]}
           value={phone}
           onChangeText={setPhone}
           placeholder="Phone Number"
           placeholderTextColor="#999"
           keyboardType="phone-pad"
+          onBlur={() => validatePhoneNumber(phone)}
         />
+        {phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
       </View>
-
-      
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -255,6 +247,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
+  errorBorder: {
+    borderColor: 'red',
+  },
   saveButton: {
     width: '100%',
     paddingVertical: 15,
@@ -291,11 +286,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginVertical: 10,
   },
   imageButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 5,
   },
 });
 
