@@ -188,7 +188,6 @@ const EditProfileScreen = ({ navigation }) => {
           onChangeText={setBio}
           placeholder="Bio"
           placeholderTextColor="#999"
-          multiline
         />
       </View>
 

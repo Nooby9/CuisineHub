@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Modal, Alert, Pressable } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFocusEffect } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
 import { googlePlacesApiKey } from '@env';
 import { verifyPermission } from '../components/NotificationManager';
+import PressableButton from '../components/PressableButton';
 
 const FavoriteRestaurantScreen = ({ navigation }) => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
@@ -144,14 +145,15 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       <Text style={styles.restaurantName}>{item.name}</Text>
       <Text style={styles.restaurantAddress}>{item.address}</Text>
       <Text>Rating: {item.rating} stars</Text>
-      <Button
-        title="Remind Me"
+      <Pressable style={styles.reminderButton}
         onPress={() => {
           setSelectedRestaurant(item);
           setShowModal(true); 
           setTempSelectedDate(new Date());
         }}
-      />
+      >
+        <Text style={styles.reminderButtonText}>Set Reminder</Text>
+      </Pressable>
     </TouchableOpacity>
   );
 
@@ -196,6 +198,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
               value={tempSelectedDate}
               mode="datetime"
               onChange={onDateChange}
+              
             />
             <Button title="Confirm" onPress={confirmDate} />
             <Button title="Close" onPress={() => setShowModal(false)} />
@@ -273,6 +276,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  reminderButton: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  reminderButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
