@@ -22,6 +22,7 @@ import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
 import EditProfileScreen from './screens/EditProfileScreen';
 import * as Notifications from 'expo-notifications';
 import { useNavigationContainerRef } from '@react-navigation/native';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 
 
@@ -74,7 +75,8 @@ function Tabs() {
 }
 
 const AuthStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome" >
+    <Stack.Screen name="Welcome" component={WelcomeScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Signup" component={SignupScreen} />
   </Stack.Navigator>
