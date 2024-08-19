@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Modal, Alert, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Alert, Pressable, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFocusEffect } from '@react-navigation/native';
@@ -16,9 +16,10 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [sortBy, setSortBy] = useState('time');
   const [date, setDate] = useState(new Date());
-  const [showModal, setShowModal] = useState(false); 
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false); 
   const [tempSelectedDate, setTempSelectedDate] = useState(new Date()); // Temporary selected date before confirmation
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -107,6 +108,32 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
     }
   };
 
+  const onAndroidDateChange = (event, selectedDate) => {
+    console.log('Date:', selectedDate)
+    if (event.type === 'set') {
+      setShowDateTimePicker(false); // Hide the picker after selecting a date
+      const currentDate = new Date();
+      setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
+      
+    }
+  };
+
+  const onAndroidTimeChange = (event, selectedTime) => {
+    console.log('Time:', selectedTime)
+    if (event.type === 'set') {
+      setShowTimePicker(false); // Hide the picker after selecting a time
+      const currentDate = new Date();
+      const selectedDate = new Date(tempSelectedDate);
+      selectedDate.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
+      if (selectedDate > currentDate) {
+        setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
+      } else {
+        Alert.alert('Invalid Date', 'Please select a future date and time.');
+      }
+      console.log('Combined Selected Date and Time: ',selectedDate);
+    }
+  };
+
   const confirmDate = async () => {
     const currentDate = new Date();
     if (tempSelectedDate <= currentDate) {
@@ -130,7 +157,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       },
     });
 
-    setShowModal(false); // Close the modal only after confirmation
+    setShowDateTimePicker(false); // Hide the picker only after confirmation
     Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${tempSelectedDate}`);
   };
 
@@ -148,7 +175,8 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       <Pressable style={styles.reminderButton}
         onPress={() => {
           setSelectedRestaurant(item);
-          setShowModal(true); 
+          setShowTimePicker(true);
+          setShowDateTimePicker(true); 
           setTempSelectedDate(new Date());
         }}
       >
@@ -184,27 +212,52 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
         />
       )}
 
-      {/* Modal for DateTimePicker */}
-      <Modal
-        visible={showModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalContainer}>
+      {/* Conditional rendering for DateTimePicker */}
+      {Platform.OS === 'ios' && showDateTimePicker && (
+        <View style={styles.pickerOverlay}>
           <View style={styles.pickerContainer}>
             <Text style={styles.modalTitle}>Select Reminder Time</Text>
             <DateTimePicker
               value={tempSelectedDate}
               mode="datetime"
               onChange={onDateChange}
-              
             />
             <Button title="Confirm" onPress={confirmDate} />
-            <Button title="Close" onPress={() => setShowModal(false)} />
+            <Button title="Close" onPress={() => setShowDateTimePicker(false)} />
+            
           </View>
         </View>
-      </Modal>
+      )}
+
+
+      {Platform.OS === 'android' && showTimePicker && ( 
+        <DateTimePicker
+          value={tempSelectedDate}
+          mode="time"
+          is24Hour={true}
+          display="default"
+          onChange={onAndroidTimeChange}
+          
+        />
+      )}
+      {Platform.OS === 'android' && showDateTimePicker && (
+        <DateTimePicker
+          value={tempSelectedDate}
+          mode="date"
+          is24Hour={true}
+          display="default"
+          onChange={onAndroidDateChange}
+        />
+      )}
+
+      
+
+      
+
+      
+
+
+
     </View>
   );
 };
@@ -259,8 +312,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  modalContainer: {
-    flex: 1,
+  pickerOverlay: {
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
