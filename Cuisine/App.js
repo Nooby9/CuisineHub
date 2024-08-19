@@ -126,7 +126,7 @@ export default function App() {
   , [])
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {isUserAuthenticated ? (
           AppStack

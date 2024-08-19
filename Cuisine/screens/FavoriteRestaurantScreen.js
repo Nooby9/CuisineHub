@@ -130,6 +130,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
     });
 
     setShowModal(false); // Close the modal only after confirmation
+    Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${tempSelectedDate}`);
   };
 
   const renderRestaurant = ({ item }) => (
@@ -148,6 +149,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
         onPress={() => {
           setSelectedRestaurant(item);
           setShowModal(true); 
+          setTempSelectedDate(new Date());
         }}
       />
     </TouchableOpacity>
