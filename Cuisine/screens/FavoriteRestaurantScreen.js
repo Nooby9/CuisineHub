@@ -20,6 +20,8 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
   const [tempSelectedDate, setTempSelectedDate] = useState(new Date()); // Temporary selected date before confirmation
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [combinedDateTime, setCombinedDateTime] = useState(null);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -109,30 +111,34 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
   };
 
   const onAndroidDateChange = (event, selectedDate) => {
-    console.log('Date:', selectedDate)
     if (event.type === 'set') {
+      console.log('Selected Date:', selectedDate);
       setShowDateTimePicker(false); // Hide the picker after selecting a date
-      const currentDate = new Date();
-      setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
-      
+      setTempSelectedDate(selectedDate); // Temporarily store the selected date
+      setShowTimePicker(true);
     }
   };
+  
 
   const onAndroidTimeChange = (event, selectedTime) => {
-    console.log('Time:', selectedTime)
     if (event.type === 'set') {
       setShowTimePicker(false); // Hide the picker after selecting a time
       const currentDate = new Date();
-      const selectedDate = new Date(tempSelectedDate);
-      selectedDate.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
-      if (selectedDate > currentDate) {
-        setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
-      } else {
-        Alert.alert('Invalid Date', 'Please select a future date and time.');
+      console.log('Temp Selected Date:', tempSelectedDate);
+      if (tempSelectedDate) {
+        const combined = new Date(tempSelectedDate);
+        combined.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
+        if (combined > currentDate) {
+          setCombinedDateTime(combined); // Update the combined date and time
+          confirmDateAndroid(combined); // Confirm the date and time
+          console.log('Combined Date:', combined);
+        } else {
+          Alert.alert('Invalid Time', 'Please select a future time.');
+        }
       }
-      console.log('Combined Selected Date and Time: ',selectedDate);
     }
   };
+  
 
   const confirmDate = async () => {
     const currentDate = new Date();
@@ -161,6 +167,33 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
     Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${tempSelectedDate}`);
   };
 
+  const confirmDateAndroid = async (date) => {
+    const currentDate = new Date();
+    if (!date || date <= currentDate) {
+      Alert.alert('Invalid Date', 'Please select a future date and time.');
+      return;
+    }
+
+    const hasPermission = await verifyPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Restaurant Reminder",
+        body: `Don't forget to visit ${selectedRestaurant.name}!`,
+        data: { restaurantId: selectedRestaurant.place_id }
+      },
+      trigger: {
+        date: date, // Use the combined date and time
+      },
+    });
+
+    setShowDateTimePicker(false); // Hide the picker after confirmation
+    Alert.alert('Reminder Set', `You will be reminded to visit ${selectedRestaurant.name} on ${date}`);
+  };
+
   const renderRestaurant = ({ item }) => (
     <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
       {item.photo_reference && (
@@ -175,7 +208,6 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       <Pressable style={styles.reminderButton}
         onPress={() => {
           setSelectedRestaurant(item);
-          setShowTimePicker(true);
           setShowDateTimePicker(true); 
           setTempSelectedDate(new Date());
         }}
