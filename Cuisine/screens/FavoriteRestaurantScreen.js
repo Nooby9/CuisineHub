@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, Button } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button, Modal, Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useFocusEffect } from '@react-navigation/native';
+import * as Location from 'expo-location';
 import { getFavoriteRestaurants } from '../Firebase/firestoreHelper';
 import { auth } from '../Firebase/firebaseSetup';
 import { googlePlacesApiKey } from '@env';
-import * as Location from 'expo-location';
-import { useFocusEffect } from '@react-navigation/native';
-
+import { verifyPermission } from '../components/NotificationManager';
 
 const FavoriteRestaurantScreen = ({ navigation }) => {
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
   const [sortedRestaurants, setSortedRestaurants] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [sortBy, setSortBy] = useState('time'); // 'time' or 'distance'
+  const [sortBy, setSortBy] = useState('time');
+  const [date, setDate] = useState(new Date());
+  const [showModal, setShowModal] = useState(false); 
+  const [tempSelectedDate, setTempSelectedDate] = useState(new Date()); // Temporary selected date before confirmation
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -46,7 +51,7 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
 
       fetchFavorites();
       getCurrentLocation();
-    }, []) // Empty dependency array means this runs on every screen focus
+    }, [])
   );
 
   useEffect(() => {
@@ -90,6 +95,43 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
     navigation.navigate('Restaurant', { place_id: restaurant.place_id });
   };
 
+  const onDateChange = (event, selectedDate) => {
+    if (event.type === 'set') {
+      const currentDate = new Date();
+      if (selectedDate > currentDate) {
+        setTempSelectedDate(selectedDate); // Temporarily store the selected date if it's valid
+      } else {
+        Alert.alert('Invalid Date', 'Please select a future date and time.');
+      }
+    }
+  };
+
+  const confirmDate = async () => {
+    const currentDate = new Date();
+    if (tempSelectedDate <= currentDate) {
+      Alert.alert('Invalid Date', 'Please select a future date and time.');
+      return;
+    }
+
+    const hasPermission = await verifyPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Restaurant Reminder",
+        body: `Don't forget to visit ${selectedRestaurant.name}!`,
+        data: { restaurantId: selectedRestaurant.place_id }
+      },
+      trigger: {
+        date: tempSelectedDate, // Use the temporary date
+      },
+    });
+
+    setShowModal(false); // Close the modal only after confirmation
+  };
+
   const renderRestaurant = ({ item }) => (
     <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
       {item.photo_reference && (
@@ -101,6 +143,13 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
       <Text style={styles.restaurantName}>{item.name}</Text>
       <Text style={styles.restaurantAddress}>{item.address}</Text>
       <Text>Rating: {item.rating} stars</Text>
+      <Button
+        title="Remind Me"
+        onPress={() => {
+          setSelectedRestaurant(item);
+          setShowModal(true); 
+        }}
+      />
     </TouchableOpacity>
   );
 
@@ -130,11 +179,30 @@ const FavoriteRestaurantScreen = ({ navigation }) => {
           renderItem={renderRestaurant}
         />
       )}
+
+      {/* Modal for DateTimePicker */}
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.modalTitle}>Select Reminder Time</Text>
+            <DateTimePicker
+              value={tempSelectedDate}
+              mode="datetime"
+              onChange={onDateChange}
+            />
+            <Button title="Confirm" onPress={confirmDate} />
+            <Button title="Close" onPress={() => setShowModal(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
-
-export default FavoriteRestaurantScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -186,4 +254,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pickerContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
 });
+
+export default FavoriteRestaurantScreen;

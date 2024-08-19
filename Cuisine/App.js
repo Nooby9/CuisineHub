@@ -21,13 +21,27 @@ import { useEffect, useState } from 'react';
 import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
 import EditProfileScreen from './screens/EditProfileScreen';
 import * as Notifications from 'expo-notifications';
+import { useNavigationContainerRef } from '@react-navigation/native';
+
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-Notifications.setNotificationHandler({
-	handleNotification: async () => { }
-});
+Notifications.setNotificationHandler({ // The parameter is an object of functions
+	handleNotification: async () => { // We are returning a promise here
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+    },
+    handleSuccess: async () => {
+      console.log("Notification was shown successfully");
+    },
+    handleError: async () => {
+      console.log("Error showing notification");
+    }
+  });
 
 
 function Tabs() {
@@ -81,6 +95,7 @@ const AppStack = (
 
 export default function App() {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const navigationRef = useNavigationContainerRef();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -98,8 +113,13 @@ export default function App() {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      const url = response.notification.request.content.data.url;
-      Linking.openURL(url);
+      const place_id = response.notification.request.content.data.restaurantId;
+      if (place_id && navigationRef.isReady()) {
+        navigationRef.navigate('Restaurant', { place_id });
+      }
+      else {
+        console.error('Navigation not ready or place_id not available:', place_id, navigationRef.isReady());
+      }
     });
     return () => subscription.remove();
   }
