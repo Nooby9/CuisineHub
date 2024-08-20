@@ -124,21 +124,26 @@ const EditProfileScreen = ({ navigation }) => {
   }
 
   const takePhotoWithCamera = async () => {
-    const hasPermission = await verifyPermissions();
-    if (!hasPermission) {
-      Alert.alert("You need to give permission to launch the camera");
-      return;
-    }
+    try {
+      const hasPermission = await verifyPermissions();
+      if (!hasPermission) {
+        Alert.alert("You need to give permission to launch the camera");
+        return;
+      }
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-      const uploadedImagePath = await uploadImageToStorage(result.assets[0].uri);
-      setImage(uploadedImagePath);
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+        const uploadedImagePath = await uploadImageToStorage(result.assets[0].uri);
+        setImage(uploadedImagePath);
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Alert.alert('Error', 'A simulator does not have a camera. Please try on a physical device.');
     }
   };
 
