@@ -66,7 +66,7 @@ const PostScreen = ({ route }) => {
 
         try {
             if (newFavoriteState) {
-              await writeWithIdToDB({timestamp:new Date(), post_id: item.id}, `User/${currentUserId}/FavoritePost`, post.id);
+              await writeWithIdToDB({timestamp:new Date(), post_id: post.id}, `User/${currentUserId}/FavoritePost`, post.id);
             }
             else {
               await deleteWithIdFromDB(`User/${currentUserId}/FavoritePost`, post.id);
