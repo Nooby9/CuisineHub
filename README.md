@@ -1,5 +1,5 @@
 # CuisineHub
-# PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO ASK FOR YOUR CURRENT LOCATION CORRECTLY!
+# PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO DISPLAY NEARBY 40KM POST DISCOVERIES IF ITS SET TO CALIFORNIA! Alternatively, set your simulator location to the coordinates: Latitude: 49.2827, Longitude: -123.1207
 ## 1. Overview
 
 **Cuisine Hub** is your ultimate guide to discovering and reviewing the best restaurants around you! Whether you're a casual diner or a gourmet enthusiast, Cuisine Hub makes it easy to find new dining spots, share your experiences, and read honest reviews from fellow food lovers. Turn every meal into an adventure with Cuisine Hub.
@@ -265,6 +265,7 @@ npx expo start --tunnel
      ![restaurant details with favorite page](image/README/restaurant_detail_with_favorite_page.png)
 
 ### 6.3 Iteration 3
+### PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO DISPLAY NEARBY 40KM POST DISCOVERIES IF ITS SET TO CALIFORNIA! Alternatively, set your simulator location to the coordinates: Latitude: 49.2827, Longitude: -123.1207
 
 #### Huijia Wang
 
@@ -282,3 +283,28 @@ npx expo start --tunnel
 6. Implementing sorting logic in the DiscoverScreen and Food Journal posts, applying a weighted order to make the post display more meaningful and relevant.
 7. Implemented the functionality to save the geographical information of the restaurant when creating or modifying a post.
 8. Updated the Discover screen to filter and display posts only from restaurants within a 40 km radius of the current location. Additionally, the distance from the current location is now one of the parameters used to sort the posts.
+
+
+#### Shurui Xu
+1. Created Favorite Restaurant screen and Favorite posts screen that displays the user liked/favorite restaurants and posts.
+![favorite_restaurant](image/README/favorite_restaurants_by_distance.png)
+![favorite_restaurant](image/README/favorite_restaurants_by_time.png)
+![favorite_post](image/README/favorite_posts.png)
+2. Allows sorting for favrite restaurants by the distance and when the user favorited the restaurant.
+3. Added welcome page to encourage users to signup/login for CuisineHub
+![welcome](image/README/welcome_page.png)
+4. User can set a reminder for their favorite restaurants at a specific time. They will receive a notification at that time. Since Android does not support "datetime" directly for the DateTimePicker component, I seperated the iOS and Android functionalities. iOS uses a modal to show the DateTimePicker all together, and Android shows date and time seperately. The user chooses the date first and time second in Android, where in iOS, the user can select both on the same modal. 
+Set reminder iOS:
+![set_reminder_ios](image/README/set_reminder_ios.png)
+![reminder_set_ios](image/README/reminder_set_ios.png)
+Set reminder Android:
+![set_reminder_android](image/README/set_reminder_android.png)
+![set_reminder_clock_android](image/README/set_reminder_clock_android.png)
+![reminder_set_android](image/README/reminder_set_android.png)
+Notification recieved for iOS and Android:
+![ios_notification](image/README/notification_ios.png)
+![android_notification](image/README/notification_android.png)
+5. Once the user clicks on the notification, they will be brought to that restaurant in the reminder.
+![notification_action_ios](image/README/notification_action_ios.png)
+6. Added comments (fetched from google places API) in restaurant page.
+![restaurant_comments](image/README/restaurant_comments.png)
