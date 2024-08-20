@@ -1,5 +1,7 @@
 # CuisineHub
+
 # PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO DISPLAY NEARBY 40KM POST DISCOVERIES IF ITS SET TO CALIFORNIA! Alternatively, set your simulator location to the coordinates: Latitude: 49.2827, Longitude: -123.1207
+
 ## 1. Overview
 
 **Cuisine Hub** is your ultimate guide to discovering and reviewing the best restaurants around you! Whether you're a casual diner or a gourmet enthusiast, Cuisine Hub makes it easy to find new dining spots, share your experiences, and read honest reviews from fellow food lovers. Turn every meal into an adventure with Cuisine Hub.
@@ -275,7 +277,7 @@ npx expo start --tunnel
 2. Filtering posts by user ID (UID) in the Food Journal, so only posts published by the user are displayed for editing.
 3. Implementing Firestore rules for posts to enhance data security and access control.
 
-   ![1723771206640](image/README/1723771206640.png)
+   ![1724178938681](image/README/1724178938681.png)
 4. Adding a current location marker to the map in the Food Journal, improving user experience by showing their position.
 
    ![1723771814029](image/README/1723771814029.png)

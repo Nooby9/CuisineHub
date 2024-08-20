@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, FlatList, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { ref, uploadBytesResumable, deleteObject } from 'firebase/storage';
@@ -166,14 +166,18 @@ const PostEditorScreen = ({ navigation, route }) => {
     const handleSubmit = async () => {
         if (isSubmitting) return; // Prevent double submission
 
+        // Trim title and content
+        const trimmedTitle = title.trim();
+        const trimmedContent = content.trim();
+
         // Check if the title is empty
-        if (!title.trim()) {
+        if (!trimmedTitle) {
             Alert.alert('Title Required', 'Please enter a title for your post.');
             return;
         }
 
         // Check if the content is empty
-        if (!content.trim()) {
+        if (!trimmedContent) {
             Alert.alert('Content Required', 'Please enter content for your post.');
             return;
         }
@@ -220,12 +224,12 @@ const PostEditorScreen = ({ navigation, route }) => {
 
                 // Retain the existing likedBy, date, and comments when editing
                 postData = {
-                    title,
+                    title:trimmedTitle,
                     imageUrls: finalImageUris,
                     place_id: placeId,
                     location: location,
                     author: post.author,
-                    comment: content,
+                    comment: trimmedContent,
                     likedBy: post.likedBy, // Retain existing likedBy
                     date: post.date, // Retain existing date
                     comments: post.comments, // Retain existing comments
@@ -233,12 +237,12 @@ const PostEditorScreen = ({ navigation, route }) => {
             } else {
                 // Create a new post with default likedBy, date, and comments
                 postData = {
-                    title,
+                    title:trimmedTitle,
                     imageUrls: uploadedImageUris,
                     place_id: placeId,
                     location: location,
                     author: currentUserId,
-                    comment: content,
+                    comment: trimmedContent,
                     likedBy: [],
                     date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
                     comments: [],
@@ -296,6 +300,7 @@ const PostEditorScreen = ({ navigation, route }) => {
     }
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
 
             {/* Search for Restaurants */}
@@ -342,9 +347,10 @@ const PostEditorScreen = ({ navigation, route }) => {
                 placeholder="Content"
                 value={content}
                 onChangeText={setContent}
-                multiline
-                numberOfLines={4}
+                multiline // Enable multiline input
+                textAlignVertical="top" 
             />
+             
             {/* Image Picker */}
             <ImagePickerComponent
                 initialImages={images}
@@ -368,8 +374,8 @@ const PostEditorScreen = ({ navigation, route }) => {
                     </Text>
                 </Pressable>
             </View>
-
-        </View>
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 
