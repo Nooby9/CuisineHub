@@ -308,3 +308,5 @@ Notification recieved for iOS and Android:
 ![notification_action_ios](image/README/notification_action_ios.png)
 6. Added comments (fetched from google places API) in restaurant page.
 ![restaurant_comments](image/README/restaurant_comments.png)
+7. Created edit profile screen to allow users to upload their profile picture from gallery or camera, update their username, bio, and Phone Number.
+![edit_profile](image/README/edit_profile.png)
