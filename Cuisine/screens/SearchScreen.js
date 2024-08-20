@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, View, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, TextInput, View, FlatList, Image, Dimensions, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import { googlePlacesApiKey } from '@env';
@@ -11,23 +11,28 @@ const SearchScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(true);
   const [region, setRegion] = useState({
-    latitude: 37.4161493,
-    longitude: -122.0812166,
+    latitude: 49.2827,
+    longitude: -123.1207,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [itemHeights, setItemHeights] = useState({});
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     (async () => {
-      // Request user location permission
+      setLocationLoading(true);
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.error('Location permission not granted');
+        alert('Permission to access current location was denied. Please enable location services in your settings.');
+        setLocationLoading(false);
         return;
       }
 
-      // Get current location
       let location = await Location.getCurrentPositionAsync({});
       setRegion({
         latitude: location.coords.latitude,
@@ -35,11 +40,35 @@ const SearchScreen = ({ navigation }) => {
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       });
+
+      setLocationLoading(false);
     })();
   }, []);
 
+  const getItemLayout = (data, index) => {
+    const height = itemHeights[index] || 0; // Default to 0 if height is not measured yet
+    return {
+      length: height,
+      offset: Object.values(itemHeights).slice(0, index).reduce((sum, h) => sum + h, 0),
+      index,
+    };
+  };
+
+  useEffect(() => {
+    if (selectedRestaurant && restaurants.length > 0 && flatListRef.current) {
+      const index = restaurants.findIndex(
+        (restaurant) => restaurant.place_id === selectedRestaurant.place_id
+      );
+      if (index !== -1) {
+        flatListRef.current.scrollToIndex({ index });
+      }
+    }
+  }, [selectedRestaurant, restaurants]);
+
   const handleSearchPress = async () => {
+    Keyboard.dismiss(); // Hide the keyboard
     setLoading(true);
+
     const options = {
       method: 'GET',
       url: `https://maps.googleapis.com/maps/api/place/textsearch/json`,
@@ -53,7 +82,6 @@ const SearchScreen = ({ navigation }) => {
 
     try {
       const response = await axios.request(options);
-      console.log('Response:', response.data.results);
       setRestaurants(response.data.results);
       updateMapRegion(response.data.results);
     } catch (error) {
@@ -66,11 +94,9 @@ const SearchScreen = ({ navigation }) => {
   const updateMapRegion = (places) => {
     if (places.length === 0) return;
 
-    // Use the coordinates of the first restaurant
-    const firstPlace = places[0];
     setRegion({
-      latitude: firstPlace.geometry.location.lat,
-      longitude: firstPlace.geometry.location.lng,
+      latitude: (places[0].geometry.location.lat + region.latitude) / 2,
+      longitude: (places[0].geometry.location.lng + region.longitude) / 2,
       latitudeDelta: 0.05,
       longitudeDelta: 0.05,
     });
@@ -81,11 +107,21 @@ const SearchScreen = ({ navigation }) => {
   };
 
   const handleRestaurantPress = (restaurant) => {
-    navigation.navigate('Restaurant', { place_id:restaurant.place_id });
+    setSelectedRestaurant(restaurant);
+    navigation.navigate('Restaurant', { place_id: restaurant.place_id });
   };
 
-  const renderRestaurant = ({ item }) => (
-    <TouchableOpacity onPress={() => handleRestaurantPress(item)} style={styles.restaurantContainer}>
+  const handleLayout = (index, event) => {
+    const { height } = event.nativeEvent.layout;
+    setItemHeights((prevHeights) => ({ ...prevHeights, [index]: height }));
+  };
+
+  const renderRestaurant = ({ item, index }) => (
+    <TouchableOpacity
+      onPress={() => handleRestaurantPress(item)}
+      style={styles.restaurantContainer}
+      onLayout={(event) => handleLayout(index, event)}
+    >
       {item.photos && item.photos.length > 0 && (
         <Image
           source={{ uri: getPhotoUrl(item.photos[0].photo_reference) }}
@@ -98,6 +134,15 @@ const SearchScreen = ({ navigation }) => {
       <Text>Number of Ratings: {item.user_ratings_total}</Text>
     </TouchableOpacity>
   );
+
+  if (locationLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Fetching location...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -112,10 +157,16 @@ const SearchScreen = ({ navigation }) => {
           <Ionicons name="search" size={24} color="black" />
         </PressableButton>
       </View>
-      <MapView
-        style={styles.map}
-        region={region}
-      >
+      <MapView style={styles.map} region={region}>
+        <Marker
+          coordinate={{
+            latitude: region.latitude,
+            longitude: region.longitude,
+          }}
+          title="My Location"
+          description="This is your current location"
+          pinColor="blue"
+        />
         {restaurants.map((restaurant) => (
           <Marker
             key={restaurant.place_id}
@@ -125,6 +176,7 @@ const SearchScreen = ({ navigation }) => {
             }}
             title={restaurant.name}
             description={restaurant.formatted_address}
+            onPress={() => setSelectedRestaurant(restaurant)}
           />
         ))}
       </MapView>
@@ -132,10 +184,15 @@ const SearchScreen = ({ navigation }) => {
         <Text>Loading...</Text>
       ) : (
         <FlatList
+          ref={flatListRef}
           data={restaurants}
           keyExtractor={(item) => item.place_id.toString()}
           renderItem={renderRestaurant}
-          ListEmptyComponent={<Text>No restaurants found</Text>}
+          ListEmptyComponent={<Text>Please Search the Restaurant in the Search Bar</Text>}
+          getItemLayout={getItemLayout}
+          onScrollToIndexFailed={(info) => {
+            console.warn('Failed to scroll to index:', info);
+          }}
         />
       )}
     </View>
@@ -148,6 +205,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    paddingLeft: 0,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -184,5 +242,10 @@ const styles = StyleSheet.create({
     height: 200,
     marginTop: 10,
     borderRadius: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -7,7 +7,7 @@ import { ref, getDownloadURL } from 'firebase/storage';
 import { auth, storage } from '../Firebase/firebaseSetup'; // Import Firebase storage setup
 import { colors, commonStyles } from '../style';
 import { FIREBASE_COLLECTIONS } from '../FirebaseCollection';
-import { fetchArrayDataByField, updateLikeStatus } from '../Firebase/firestoreHelper';
+import { fetchArrayDataByField, updateLikeStatus, writeWithIdToDB, deleteWithIdFromDB } from '../Firebase/firestoreHelper';
 import { getUserName } from '../Firebase/firestoreHelper';
 
 // Define collection name
@@ -55,7 +55,6 @@ const PostItem = ({ item, onPress }) => {
   async function fetchLikeData() {
     try {
       const likedBy = await fetchArrayDataByField(COLLECTION_NAME, item.id, 'likedBy');
-
       setIsFavorite(likedBy.includes(currentUserId));
       setLikesCount(likedBy.length);
     } catch (error) {
@@ -81,6 +80,17 @@ const PostItem = ({ item, onPress }) => {
     } catch (error) {
       console.error('Error updating likes in Firestore:', error);
       // Optionally handle error, e.g., rollback the like count in UI
+    }
+
+    try {
+      if (newFavoriteState) {
+        await writeWithIdToDB({timestamp:new Date(), post_id: item.id}, `User/${currentUserId}/FavoritePost`, item.id);
+      }
+      else {
+        await deleteWithIdFromDB(`User/${currentUserId}/FavoritePost`, item.id);
+      }
+    } catch (error) {
+      console.error('Error inserting likes to FavoritePosts in Firestore:', error);
     }
   };
 

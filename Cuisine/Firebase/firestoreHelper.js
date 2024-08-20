@@ -169,6 +169,47 @@ export async function getFavoriteRestaurants(userId){
   }
 }
 
+export async function getFavoritePosts(userId) {
+  try {
+    const favoritePostsCollection = collection(database, `User/${userId}/FavoritePost`);
+    const favoritePostsSnapshot = await getDocs(favoritePostsCollection);
+
+    // Get post IDs from the favorite posts
+    const favoritePosts = favoritePostsSnapshot.docs.map(doc => doc.data());
+
+    const postDetailsPromises = favoritePosts.map(async (favoritePost) => {
+      const postDocRef = doc(database, 'Post', favoritePost.post_id); 
+      const postDocSnapshot = await getDoc(postDocRef);
+
+      // Combine the post details with favorite post data
+      return {
+        ...postDocSnapshot.data(),
+        id: favoritePost.post_id,
+        timestamp: favoritePost.timestamp, // Include the timestamp or any other metadata from FavoritePost
+      };
+    });
+
+    // Wait for all the post details to be fetched
+    const posts = await Promise.all(postDetailsPromises);
+
+    return posts;
+  } catch (e) {
+    console.error("Get favorite posts error: ", e);
+    return [];
+  }
+}
+
+export const updateUserInfo = async (userId, updatedInfo) => {
+  try {
+    const userRef = doc(database, 'User', userId);
+    await updateDoc(userRef, updatedInfo); // Merge the updated fields into the user's document
+    console.log('User info updated successfully');
+  } catch (error) {
+    console.error('Error updating user info:', error);
+    throw error;
+  }
+};
+
 
 
 

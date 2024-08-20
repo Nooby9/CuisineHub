@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../style';
@@ -14,6 +14,7 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  // Watch for authentication state change
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -23,16 +24,19 @@ const ProfileScreen = () => {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (user) {
+  // Fetch user info from the database whenever the screen gains focus
+  useFocusEffect(
+    useCallback(() => {
       const fetchUserInfo = async () => {
-        console.log(user.uid);
-        const userData = await getUserInfoDB(user.uid);
-        setUserInfo(userData);
+        if (user) {
+          const userData = await getUserInfoDB(user.uid);
+          setUserInfo(userData);
+        }
+        setLoading(false); // Set loading to false after fetching data
       };
       fetchUserInfo();
-    }
-  }, [user]);
+    }, [user])
+  );
 
   const handleNewPost = () => {
     navigation.navigate('New Post');
@@ -65,11 +69,12 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: userInfo?.photoUrl || 'https://via.placeholder.com/150' }}
+        source={{ uri: userInfo?.profileImage || 'https://via.placeholder.com/150' }} // Profile image fetched from database
         style={styles.profilePicture}
       />
       <Text style={styles.profileName}>{userInfo?.username || 'User Name'}</Text>
       <Text style={styles.profileName}>{auth.currentUser.email || 'User Email'}</Text>
+      <Text style={styles.profileBio}>{userInfo?.bio || 'User Bio'}</Text> 
       <View style={styles.editButtonContainer}>
         <PressableButton onPress={handleEditProfile}>
           <Ionicons name="pencil" size={24} color={colors.primary} />
@@ -92,13 +97,13 @@ const ProfileScreen = () => {
         <Text style={styles.actionText}>Notifications</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.signoutButton} onPress={()=>{
-          try{
-            signOut(auth);
-          } catch (error) {
-            console.log("Error signing out: ", error);
-          }
-        }}>
+      <TouchableOpacity style={styles.signoutButton} onPress={() => {
+        try {
+          signOut(auth);
+        } catch (error) {
+          console.log("Error signing out: ", error);
+        }
+      }}>
         <Text style={styles.signoutText}>Sign Out</Text>
       </TouchableOpacity>
     </View>
@@ -127,6 +132,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  profileBio: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 10,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
   editButtonContainer: {
     position: 'absolute',

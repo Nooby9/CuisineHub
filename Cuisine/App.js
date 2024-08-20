@@ -13,13 +13,13 @@ import RestaurantScreen from './screens/RestaurantScreen';
 import PostEditorScreen from './screens/PostEditorScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import FoodJournalScreen from './screens/FoodJournalScreen';
-import SavedPostsScreen from './screens/FavoriteScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './Firebase/firebaseSetup';
 import { useEffect, useState } from 'react';
-import FavoriteScreen from './screens/FavoriteScreen';
+import FavoritesTabNavigator from './screens/FavoritesTabNavigator';
+import EditProfileScreen from './screens/EditProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -68,7 +68,8 @@ const AppStack = (
     <Stack.Screen name="New Post" component={PostEditorScreen} />
     <Stack.Screen name="Edit Post" component={PostEditorScreen} />
     <Stack.Screen name="Personal Food Journal" component={FoodJournalScreen} />
-    <Stack.Screen name="Favorites" component={FavoriteScreen} />
+    <Stack.Screen name="Favorites" component={FavoritesTabNavigator} />
+    <Stack.Screen name="Edit Profile" component={EditProfileScreen} />
   </>
 );
 
