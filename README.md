@@ -1,6 +1,8 @@
 # CuisineHub
 
 # PLEASE USE YOUR PHONE TO SCAN THE QR CODE WHEN RUNNING! A SIMULATOR/EMULATOR WOULD NOT BE ABLE TO DISPLAY NEARBY 40KM POST DISCOVERIES IF ITS SET TO CALIFORNIA! Alternatively, set your simulator location to the coordinates: Latitude: 49.2827, Longitude: -123.1207
+## App Demonstration Video: 
+[CuisineHub Demonstration Video](https://youtu.be/QLWakg5BrJQ)
 
 ## 1. Overview
 
