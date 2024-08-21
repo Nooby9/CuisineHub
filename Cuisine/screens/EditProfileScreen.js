@@ -19,6 +19,9 @@ const EditProfileScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        if (!auth.currentUser) {
+          return;
+        }
         const userData = await getUserInfoDB(auth.currentUser.uid);
         if (userData) {
           setUsername(userData.username || '');
